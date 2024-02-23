@@ -144,11 +144,233 @@ export class Assignment3 extends Scene {
         program_state.lights = [new Light(light_position, col, 10**radius)];
 
         let model_transform = Mat4.identity().times(Mat4.scale(radius, radius, radius)); // Scale the sphere
+        this.shapes.sphere.draw(        // display():  Called once per frame of animation.
+        // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
+        if (!context.scratchpad.controls) {
+            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            // Define the global camera and projection matrices, which are stored in program_state.
+            program_state.set_camera(this.initial_camera_location);
+        }
+
+        program_state.projection_transform = Mat4.perspective(
+            Math.PI / 4, context.width / context.height, .1, 1000);
+
+
+
+
+
+
+
+        // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
+
+
+
+        // TODO: Create Planets (Requirement 1)
+
+
+        /*
+        // Calculate the progress of the animation (from 0 to 1)
+        let progress = (t % animation_duration) / animation_duration;
+        let start_radius = 1;
+        let end_radius = 3;
+        let radius;
+        if(progress<0.5){
+            radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
+        }
+        else{
+            radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
+        }
+        */
+
+        //simplest interpolation
+        /*
+        let progress = (t % animation_duration) / animation_duration;
+        let start_radius = 1;
+        let end_radius = 3;
+        let radius;
+
+        if (progress < 0.5) {
+            radius = start_radius + 2 * progress * (end_radius - start_radius);
+        } else {
+            radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
+        }
+         */
+
+
+
+        /*
+                //interpolation method
+                let a= t % animation_duration;
+                let radius = 1;
+                if (a <= animation_duration / 2) {
+                    radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
+                }
+                else {
+                    radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
+                }
+        */
+
+
+        // Sine wave method
+        // Calculate the radius using a scaled and offset sine function
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+        const animation_duration = 7;
+
+        const min_radius = 1; // Minimum radius
+        const max_radius = 3; // Maximum radius
+        const amplitude = (max_radius - min_radius) / 2; // Amplitude of the sine wave
+        const offset = min_radius + amplitude; // Offset to achieve minimum radius
+        let radius = amplitude * Math.sin((2 * Math.PI * t) / animation_duration) + offset;
+
+
+        const min_color = 0; //Minimum color
+        const max_color = 255; //Maximum color
+        const color_amp = (max_color -min_color)/2; //Amplitude of sine wave color
+        const color_offset = min_color + color_amp;
+        let non_hex_color = Math.round(color_amp * Math.sin((2*Math.PI * t) / animation_duration) + color_offset); //need to round to integer value
+        let hex_col = non_hex_color.toString(16).padStart(2, '0');
+        let col = hex_color("#" + "ff" + hex_col + hex_col);
+
+
+        // TODO: Lighting (Requirement 2)
+        const light_position = vec4(0, 0, 0, 1);
+        // The parameters of the Light are: position, color, size
+        program_state.lights = [new Light(light_position, col, 10**radius)];
+
+        let model_transform = Mat4.identity().times(Mat4.scale(radius, radius, radius)); // Scale the sphere
         this.shapes.sphere.draw(
             context,
             program_state,
             model_transform,
             this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+        );
+
+
+        let planet_color = hex_color("#" + "ffffff");
+
+        let model_transform2 = Mat4.identity().times(Mat4.translation(5,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform2,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform3 = Mat4.identity().times(Mat4.translation(8,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform3,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform4 = Mat4.identity().times(Mat4.translation(11,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform4,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform5 = Mat4.identity().times(Mat4.translation(13,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform5,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        /*
+        let a= t % animation_duration;
+        let r = (255).toString(16);
+        let g, b; // Declare g and b outside of the if-else blocks
+
+        if(a<3.5){
+            g = ("00" + (72.857*a).toString(16)).slice(-2);
+            b = ("00" + (72.857*a).toString(16)).slice(-2);
+        }
+
+        else{
+            g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+            b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+        }
+
+        let col = hex_color("#" + r + g + b);
+        */
+
+
+
+
+        /*
+
+        // Interpolate between red (255, 0, 0) and white (255, 255, 255)
+        let start_color, end_color;
+
+        if (progress < 0.5) {
+            start_color = [255, 0, 0]; // Red
+            end_color = [255, 255, 255]; // White
+        } else {
+            start_color = [255, 0, 0]; // red
+            end_color = [255, 255, 255]; // white
+            progress = 1 - progress; // Reverse progress for the second half of the animation
+        }
+
+        // Linear interpolation for each color component (r, g, b)
+        let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
+        let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
+        let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
+
+        // Convert the RGB components to hexadecimal strings
+        r = r.toString(16).padStart(2, '0');
+        g = g.toString(16).padStart(2, '0');
+        b = b.toString(16).padStart(2, '0');
+
+        // Concatenate the hexadecimal components to form the color string
+        let col = hex_color("#" + r + g + b);
+
+         */
+
+
+
+        context,
+            program_state,
+            model_transform,
+            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+        );
+
+
+        let planet_color = hex_color("#" + "ffffff");
+
+        let model_transform2 = Mat4.identity().times(Mat4.translation(5,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform2,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform3 = Mat4.identity().times(Mat4.translation(8,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform3,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform4 = Mat4.identity().times(Mat4.translation(11,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform4,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
+        );
+
+        let model_transform5 = Mat4.identity().times(Mat4.translation(13,0,0))
+        this.shapes.sphere1.draw(
+            context,
+            program_state,
+            model_transform5,
+            this.materials.test.override({ ambient:0, color:planet_color}) // Use maximum ambient and calculated color
         );
 
         /*
