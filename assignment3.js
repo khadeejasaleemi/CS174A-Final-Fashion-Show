@@ -44,7 +44,7 @@ export class Assignment3 extends Scene {
             planet4: new Material(new defs.Phong_Shader(),
                 {ambient: 0, color: hex_color("#1221C9"), specularity: 1}),
             moon:new Material(new defs.Phong_Shader(),
-                {ambient: 0, color: hex_color("#1221C9"), specularity: 1}),
+                {ambient: 0, color: hex_color("#DE3163"), specularity: 1}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -74,110 +74,6 @@ export class Assignment3 extends Scene {
 
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
-
-
-
-
-
-
-
-        // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
-
-
-
-        // TODO: Create Planets (Requirement 1)
-
-
-        /*
-        // Calculate the progress of the animation (from 0 to 1)
-        let progress = (t % animation_duration) / animation_duration;
-        let start_radius = 1;
-        let end_radius = 3;
-        let radius;
-        if(progress<0.5){
-            radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
-        }
-        else{
-            radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
-        }
-        */
-
-        //simplest interpolation
-        /*
-        let progress = (t % animation_duration) / animation_duration;
-        let start_radius = 1;
-        let end_radius = 3;
-        let radius;
-
-        if (progress < 0.5) {
-            radius = start_radius + 2 * progress * (end_radius - start_radius);
-        } else {
-            radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
-        }
-         */
-
-
-
-/*
-        //interpolation method
-        let a= t % animation_duration;
-        let radius = 1;
-        if (a <= animation_duration / 2) {
-            radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
-        }
-        else {
-            radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
-        }
-*/
-
-
-
-
-
-
-
-
-        /*
-        // Calculate the progress of the animation (from 0 to 1)
-        let progress = (t % animation_duration) / animation_duration;
-        let start_radius = 1;
-        let end_radius = 3;
-        let radius;
-        if(progress<0.5){
-            radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
-        }
-        else{
-            radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
-        }
-        */
-
-        //simplest interpolation
-        /*
-        let progress = (t % animation_duration) / animation_duration;
-        let start_radius = 1;
-        let end_radius = 3;
-        let radius;
-
-        if (progress < 0.5) {
-            radius = start_radius + 2 * progress * (end_radius - start_radius);
-        } else {
-            radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
-        }
-         */
-
-
-
-        /*
-                //interpolation method
-                let a= t % animation_duration;
-                let radius = 1;
-                if (a <= animation_duration / 2) {
-                    radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
-                }
-                else {
-                    radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
-                }
-        */
 
 
         // Sine wave method
@@ -297,113 +193,10 @@ export class Assignment3 extends Scene {
         this.moon = transform_moon;
 
         if(this.attached !== undefined) {
-            let desired = Mat4.inverse.times(Mat4.translation([0,0,5]).times(this.attached()));
-            //desired.map((x,i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
+            let desired = Mat4.inverse(this.attached().times(Mat4.translation(0, 0, 5)));
+            desired.map((x,i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
             program_state.set_camera(desired);
         }
-        /*
-        let a= t % animation_duration;
-        let r = (255).toString(16);
-        let g, b; // Declare g and b outside of the if-else blocks
-
-        if(a<3.5){
-            g = ("00" + (72.857*a).toString(16)).slice(-2);
-            b = ("00" + (72.857*a).toString(16)).slice(-2);
-        }
-
-        else{
-            g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-            b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-        }
-
-        let col = hex_color("#" + r + g + b);
-        */
-
-
-
-
-        /*
-
-        // Interpolate between red (255, 0, 0) and white (255, 255, 255)
-        let start_color, end_color;
-
-        if (progress < 0.5) {
-            start_color = [255, 0, 0]; // Red
-            end_color = [255, 255, 255]; // White
-        } else {
-            start_color = [255, 0, 0]; // red
-            end_color = [255, 255, 255]; // white
-            progress = 1 - progress; // Reverse progress for the second half of the animation
-        }
-
-        // Linear interpolation for each color component (r, g, b)
-        let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
-        let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
-        let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
-
-        // Convert the RGB components to hexadecimal strings
-        r = r.toString(16).padStart(2, '0');
-        g = g.toString(16).padStart(2, '0');
-        b = b.toString(16).padStart(2, '0');
-
-        // Concatenate the hexadecimal components to form the color string
-        let col = hex_color("#" + r + g + b);
-
-         */
-
-
-
-
-
-        /*
-        let a= t % animation_duration;
-        let r = (255).toString(16);
-        let g, b; // Declare g and b outside of the if-else blocks
-
-        if(a<3.5){
-            g = ("00" + (72.857*a).toString(16)).slice(-2);
-            b = ("00" + (72.857*a).toString(16)).slice(-2);
-        }
-
-        else{
-            g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-            b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-        }
-
-        let col = hex_color("#" + r + g + b);
-        */
-
-
-
-
-        /*
-
-        // Interpolate between red (255, 0, 0) and white (255, 255, 255)
-        let start_color, end_color;
-
-        if (progress < 0.5) {
-            start_color = [255, 0, 0]; // Red
-            end_color = [255, 255, 255]; // White
-        } else {
-            start_color = [255, 0, 0]; // red
-            end_color = [255, 255, 255]; // white
-            progress = 1 - progress; // Reverse progress for the second half of the animation
-        }
-
-        // Linear interpolation for each color component (r, g, b)
-        let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
-        let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
-        let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
-
-        // Convert the RGB components to hexadecimal strings
-        r = r.toString(16).padStart(2, '0');
-        g = g.toString(16).padStart(2, '0');
-        b = b.toString(16).padStart(2, '0');
-
-        // Concatenate the hexadecimal components to form the color string
-        let col = hex_color("#" + r + g + b);
-
-         */
 
 
     }
@@ -607,6 +400,7 @@ class Ring_Shader extends Shader {
         // TODO:  Complete the main function of the fragment shader (Extra Credit Part II).
         return this.shared_glsl_code() + `
         void main(){
+            //hyperparameter 18.01, play around until you get a correct one
             float scalar = sin(18.01 * distance(point_position.xyz, center.xyz));
             //multiply sine by the color of the planet, which are the normalized RGB values
             //#B08040 is the color of the planet
@@ -617,4 +411,216 @@ class Ring_Shader extends Shader {
         }`;
     }
 }
+
+
+
+/*
+        let a= t % animation_duration;
+        let r = (255).toString(16);
+        let g, b; // Declare g and b outside of the if-else blocks
+
+        if(a<3.5){
+            g = ("00" + (72.857*a).toString(16)).slice(-2);
+            b = ("00" + (72.857*a).toString(16)).slice(-2);
+        }
+
+        else{
+            g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+            b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+        }
+
+        let col = hex_color("#" + r + g + b);
+        */
+
+
+
+
+/*
+
+// Interpolate between red (255, 0, 0) and white (255, 255, 255)
+let start_color, end_color;
+
+if (progress < 0.5) {
+    start_color = [255, 0, 0]; // Red
+    end_color = [255, 255, 255]; // White
+} else {
+    start_color = [255, 0, 0]; // red
+    end_color = [255, 255, 255]; // white
+    progress = 1 - progress; // Reverse progress for the second half of the animation
+}
+
+// Linear interpolation for each color component (r, g, b)
+let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
+let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
+let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
+
+// Convert the RGB components to hexadecimal strings
+r = r.toString(16).padStart(2, '0');
+g = g.toString(16).padStart(2, '0');
+b = b.toString(16).padStart(2, '0');
+
+// Concatenate the hexadecimal components to form the color string
+let col = hex_color("#" + r + g + b);
+
+ */
+
+
+
+
+
+/*
+let a= t % animation_duration;
+let r = (255).toString(16);
+let g, b; // Declare g and b outside of the if-else blocks
+
+if(a<3.5){
+    g = ("00" + (72.857*a).toString(16)).slice(-2);
+    b = ("00" + (72.857*a).toString(16)).slice(-2);
+}
+
+else{
+    g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+    b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
+}
+
+let col = hex_color("#" + r + g + b);
+*/
+
+
+
+
+/*
+
+// Interpolate between red (255, 0, 0) and white (255, 255, 255)
+let start_color, end_color;
+
+if (progress < 0.5) {
+    start_color = [255, 0, 0]; // Red
+    end_color = [255, 255, 255]; // White
+} else {
+    start_color = [255, 0, 0]; // red
+    end_color = [255, 255, 255]; // white
+    progress = 1 - progress; // Reverse progress for the second half of the animation
+}
+
+// Linear interpolation for each color component (r, g, b)
+let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
+let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
+let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
+
+// Convert the RGB components to hexadecimal strings
+r = r.toString(16).padStart(2, '0');
+g = g.toString(16).padStart(2, '0');
+b = b.toString(16).padStart(2, '0');
+
+// Concatenate the hexadecimal components to form the color string
+let col = hex_color("#" + r + g + b);
+
+ */
+
+
+
+
+
+
+
+// TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
+
+
+
+// TODO: Create Planets (Requirement 1)
+
+
+/*
+// Calculate the progress of the animation (from 0 to 1)
+let progress = (t % animation_duration) / animation_duration;
+let start_radius = 1;
+let end_radius = 3;
+let radius;
+if(progress<0.5){
+    radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
+}
+else{
+    radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
+}
+*/
+
+//simplest interpolation
+/*
+let progress = (t % animation_duration) / animation_duration;
+let start_radius = 1;
+let end_radius = 3;
+let radius;
+
+if (progress < 0.5) {
+    radius = start_radius + 2 * progress * (end_radius - start_radius);
+} else {
+    radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
+}
+ */
+
+
+
+/*
+        //interpolation method
+        let a= t % animation_duration;
+        let radius = 1;
+        if (a <= animation_duration / 2) {
+            radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
+        }
+        else {
+            radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
+        }
+*/
+
+
+
+
+
+
+
+
+/*
+// Calculate the progress of the animation (from 0 to 1)
+let progress = (t % animation_duration) / animation_duration;
+let start_radius = 1;
+let end_radius = 3;
+let radius;
+if(progress<0.5){
+    radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
+}
+else{
+    radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
+}
+*/
+
+//simplest interpolation
+/*
+let progress = (t % animation_duration) / animation_duration;
+let start_radius = 1;
+let end_radius = 3;
+let radius;
+
+if (progress < 0.5) {
+    radius = start_radius + 2 * progress * (end_radius - start_radius);
+} else {
+    radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
+}
+ */
+
+
+
+/*
+        //interpolation method
+        let a= t % animation_duration;
+        let radius = 1;
+        if (a <= animation_duration / 2) {
+            radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
+        }
+        else {
+            radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
+        }
+*/
+
+
 
