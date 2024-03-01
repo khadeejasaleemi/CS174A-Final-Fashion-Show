@@ -19,6 +19,9 @@ export class Assignment3 extends Scene {
             sphere3: new defs.Subdivision_Sphere(3),
             circle: new defs.Regular_2D_Polygon(1, 15),
             ring: new defs.Torus(50, 50),
+            rectangle: new defs.Cube(),
+            cylinder: new defs.Cylindrical_Tube(),
+            triangle: new defs.Triangle(),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -31,20 +34,8 @@ export class Assignment3 extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
-            planet1: new Material(new defs.Phong_Shader(),
-                {ambient: 0, diffusivity: 1, color: hex_color("#808080"), specularity: 0}),
-            planet2_gouraud: new Material(new Gouraud_Shader(),
-                {ambient: 0, diffusivity: .2, color: hex_color("#80FFFF"), specularity: 1}),
-            planet2_phong: new Material(new defs.Phong_Shader(),
-                {ambient: 0, diffusivity: .2, color: hex_color("#80FFFF"), specularity: 1}),
-            planet3: new Material(new defs.Phong_Shader(),
-                {ambient:0, diffusivity: 1, color: hex_color("#B08040") ,specularity:1}),
-            ring: new Material(new Ring_Shader(),
-                {ambient: 0, diffusivity: 0, color: hex_color("#B08040"), specularity: 0, smoothness: 0}),
-            planet4: new Material(new defs.Phong_Shader(),
-                {ambient: 0, color: hex_color("#1221C9"), specularity: 1}),
-            moon:new Material(new defs.Phong_Shader(),
-                {ambient: 0, color: hex_color("#DE3163"), specularity: 1}),
+
+
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -81,121 +72,213 @@ export class Assignment3 extends Scene {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         const animation_duration = 7;
 
-        const min_radius = 1; // Minimum radius
-        const max_radius = 3; // Maximum radius
-        const amplitude = (max_radius - min_radius) / 2; // Amplitude of the sine wave
-        const offset = min_radius + amplitude; // Offset to achieve minimum radius
-        let radius = amplitude * Math.sin((2 * Math.PI * t) / animation_duration) + offset;
-
-
-        const min_color = 0; //Minimum color`¸
-        const max_color = 255; //Maximum color
-        const color_amp = (max_color -min_color)/2; //Amplitude of sine wave color
-        const color_offset = min_color + color_amp;
-        let non_hex_color = Math.round(color_amp * Math.sin((2*Math.PI * t) / animation_duration) + color_offset); //need to round to integer value
-        let hex_col = non_hex_color.toString(16).padStart(2, '0');
-        let col = hex_color("#" + "ff" + hex_col + hex_col);
-
+        let radius = 1; // Minimum radius
+        let col = hex_color("#" + "ffffff");
+        let skin_color = hex_color("#C68863");
 
         // TODO: Lighting (Requirement 2)
-        const light_position = vec4(0, 0,0, 1);
+        const light_position = vec4(0, 0,0, 0);
 
         // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, col, 10**radius)];
+        program_state.lights = [new Light(light_position, col, radius)];
 
 
-        let model_transform = Mat4.identity().times(Mat4.scale(radius, radius, radius)); // Scale the sphere
+        let head_transform = Mat4.identity().times(Mat4.scale(radius, radius, radius)); // Scale the sphere
+        head_transform = head_transform.times(Mat4.translation(0,2,0));
         this.shapes.sphere.draw(
             context,
             program_state,
-            model_transform,
+            head_transform,
+            this.materials.test.override({ ambient:1, color:skin_color}) // Use maximum ambient and calculated color
+        );
+
+        // Define the transformation for the nose
+       // const nose_transform = head_transform.times(Mat4.translation(0, -0.2, radius)); // Translate the nose below the head
+
+// Draw the nose using a tetrahedron shape
+        /*
+        this.shapes.triangle.draw(
+            context,
+            program_state,
+            nose_transform.times(Mat4.scale(0.2, 0.2, 0.2)), // Scale the nose
+            this.materials.test.override({ ambient: 1, color: hex_color("#8B4513") }) // Use maximum ambient and specified nose color
+        );
+         */
+
+
+
+
+        const eye_color = hex_color("#000000");
+
+        // Define the transformation for the eyes
+        const eye_radius = 0.1; // Radius of the eyes
+        const eye_offset = 0.25; // Offset of the eyes from the center of the head
+
+// Define the transformations for the left and right eyes
+        const left_eye_transform = head_transform.times(Mat4.translation(-eye_offset, 0, radius)); // Translate left eye
+        const right_eye_transform = head_transform.times(Mat4.translation(eye_offset, 0, radius)); // Translate right eye
+
+// Draw the left eye
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            left_eye_transform.times(Mat4.scale(eye_radius, eye_radius, eye_radius)), // Scale the eye
+            this.materials.test.override({ ambient: 1, color: eye_color }) // Use maximum ambient and specified eye color
+        );
+
+// Draw the right eye
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            right_eye_transform.times(Mat4.scale(eye_radius, eye_radius, eye_radius)), // Scale the eye
+            this.materials.test.override({ ambient: 1, color: eye_color }) // Use maximum ambient and specified eye color
+        );
+
+        // Define the color for the white circle (white)
+        const white_color = hex_color("#FFFFFF");
+
+
+// Draw the left white circle
+        this.shapes.circle.draw(
+            context,
+            program_state,
+            left_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
+            this.materials.test.override({ ambient: 1, color: white_color }) // Use maximum ambient and white circle color
+        );
+
+        this.shapes.circle.draw(
+            context,
+            program_state,
+            right_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
+            this.materials.test.override({ ambient: 1, color: white_color }) // Use maximum ambient and white circle color
+        );
+
+
+
+        const smile_transform = head_transform.times(Mat4.translation(0, -0.4, radius-0.05)); // Translate the smile
+
+// Draw the smile curve (bottom half of torus)
+        this.shapes.torus.draw(
+            context,
+            program_state,
+            smile_transform.times(Mat4.scale(0.3, 0.1, 0.2)), // Scale the smile to flatten it
+            this.materials.test.override({ ambient: 1, color: hex_color("#FF0000") }) // Use maximum ambient and red smile color
+        );
+
+        let hat_transform = head_transform.times((Mat4.translation(0,0.5,0)));
+
+
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            hat_transform.times(Mat4.scale(1.2,0,1.2)),
+            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+        );
+
+        let hat_bottom_transform = hat_transform.times(Mat4.scale(1.2, 0.6, 1.2)); // Same scale as the top of the hat
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            hat_bottom_transform,
+            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+        );
+
+        let body_transform = Mat4.identity().times(Mat4.scale(1,1,0.4));
+        let body_color = hex_color("#0000FF"); // Light brown
+
+        this.shapes.rectangle.draw(
+            context,
+            program_state,
+            body_transform,
+            this.materials.test.override({ ambient:1, color:body_color}) // Use maximum ambient and calculated color
+        );
+
+        let neck_transform = body_transform.times(Mat4.translation(0,1,0)).times(Mat4.scale(0.3,0.3,1))
+        this.shapes.rectangle.draw(
+            context,
+            program_state,
+            neck_transform,
+            this.materials.test.override({ ambient:1, color:skin_color}) // Use maximum ambient and calculated color
+        );
+
+
+        let leg_transform1 = Mat4.translation(0.5,-2.2,0).times(Mat4.scale(0.4,1.2,1));
+        let leg_transform2 = Mat4.translation(-0.5,-2.2,0).times(Mat4.scale(0.4,1.2,1));
+
+
+        this.shapes.rectangle.draw(
+            context,
+            program_state,
+            leg_transform1.times(body_transform),
             this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
         );
 
 
-        const ORBIT_RADIUS_1 = 5;
-        const ORBIT_RADIUS_2 = 8;
-        const ORBIT_RADIUS_3 = 11;
-        const ORBIT_RADIUS_4 = 14;
-        const ORBIT_SPEED_1 = 0.001;
-        const ORBIT_SPEED_2 = 0.0008;
-        const ORBIT_SPEED_3 = 0.0006;
-        const ORBIT_SPEED_4 = 0.0004;
 
-
-        //First planet
-        //Grey, Flat Shaded, 2 Subdivisions (Sphere2), and Diffuse only
-        //let transform_planet1 = Mat4.rotation(-t , 0,1,0).times(Mat4.translation(5,0,0)).times(Mat4.identity());
-        let transform_planet1 = Mat4.identity()
-           .times(Mat4.translation(ORBIT_RADIUS_1 * Math.cos(program_state.animation_time * ORBIT_SPEED_1), 0, ORBIT_RADIUS_1 * Math.sin(program_state.animation_time * ORBIT_SPEED_1)));
-
-        this.shapes.sphere2.draw(
+        this.shapes.rectangle.draw(
             context,
             program_state,
-            transform_planet1,
-            this.materials.planet1 // Use maximum ambient and calculated color
+            leg_transform2.times(body_transform),
+            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
         );
 
-        // Second Planet
-        // Swampy green-blue, 3 subvisions (Sphere3), max specular, low diffuse
-        //let transform_planet2 = Mat4.rotation(-t/2 , 0,1,0).times(Mat4.translation(8,0,0)).times(Mat4.identity());
-        let transform_planet2 = Mat4.identity()
-            .times(Mat4.translation(ORBIT_RADIUS_2 * Math.cos(program_state.animation_time * ORBIT_SPEED_2), 0, ORBIT_RADIUS_2 * Math.sin(program_state.animation_time * ORBIT_SPEED_2)));
+        const arm_length = 1.5; // Length of the arm
+        const arm_angle = Math.PI / 4; // Angle of the arm (45 degrees)
+        const arm_left = Mat4.translation(-1.35,0.15,0).times(Mat4.rotation(-arm_angle, 0, 0, 1). times(Mat4.scale(0.35,0.8,1)));
+        const arm_right = Mat4.translation(1.35,0.15,0).times(Mat4.rotation(arm_angle, 0, 0, 1). times(Mat4.scale(0.3,0.8,1)));
+        //const arm_translation1 = arm.times(Mat4.translation(-1.5, -1.5, 0).times(Mat4.rotation(arm_angle, 0, 1, 0)));
+        //const arm_translation2 = arm.times(Mat4.translation(1.5, -1.5, 0).times(Mat4.rotation(-arm_angle, 0, 1, 0)));
 
-        if(Math.floor(t%2) == 1){
-            // Gouraud shading every odd second
-            this.shapes.sphere3.draw(context, program_state, transform_planet2, this.materials.planet2_gouraud);
-        }
-        else{
-            // Phong shading every even second
-            this.shapes.sphere3.draw(context, program_state, transform_planet2, this.materials.planet2_phong);
-        }
 
-        //Third Planet
-        //let transform_planet3 = Mat4.rotation(-t/3 , 0,1,0).times(Mat4.translation(11,0,0)).times(Mat4.identity()).times(Mat4.rotation(Math.sin(t), 1, 0, 0));
-        let transform_planet3 = Mat4.identity().times(Mat4.translation(ORBIT_RADIUS_3 * Math.cos(program_state.animation_time * ORBIT_SPEED_3), 0, ORBIT_RADIUS_3 * Math.sin(program_state.animation_time * ORBIT_SPEED_3))).times(Mat4.rotation(Math.sin(t), 1, 0, 0));
-        this.shapes.sphere.draw(
+        this.shapes.rectangle.draw(
             context,
             program_state,
-            transform_planet3,
-            this.materials.planet3// Use maximum ambient and calculated color
+            body_transform.times(arm_left), // Apply arm transformation relative to the body
+            this.materials.test.override({ ambient: 1, color: skin_color }) // Use maximum ambient and calculated color
         );
 
-        //Ring, with torus shape, flattened
-        //Rings matrix must be places on planet matrix
-        let ring_transform = transform_planet3.times(Mat4.scale(3, 3, 0.1));
-        this.shapes.ring.draw(context, program_state, ring_transform, this.materials.ring);
-
-
-        //Fourth Planet
-        let transform_planet4 = Mat4.identity()
-            .times(Mat4.translation(ORBIT_RADIUS_4 * Math.cos(program_state.animation_time * ORBIT_SPEED_4), 0, ORBIT_RADIUS_4 * Math.sin(program_state.animation_time * ORBIT_SPEED_4)));
-        this.shapes.sphere.draw(
+        this.shapes.rectangle.draw(
             context,
             program_state,
-            transform_planet4,
-            this.materials.planet4 // Use maximum ambient and calculated color
+            body_transform.times(arm_right), // Apply arm transformation relative to the body
+            this.materials.test.override({ ambient: 1, color: skin_color }) // Use maximum ambient and calculated color
         );
 
-        //Moon for fourth planet
-        let transform_moon = transform_planet4.times(Mat4.translation(2 * Math.cos(program_state.animation_time * 0.001), 0, 2 * Math.sin(program_state.animation_time * 0.001)));
-        this.shapes.sphere1.draw(
+
+
+//
+        // Define transformations for the left and right shoes
+        const left_shoe_transform = Mat4.translation(-0.55, -3.2, 0.1).times(Mat4.scale(0.5, 0.2, 0.8));
+        const right_shoe_transform = Mat4.translation(0.55, -3.2, 0.1).times(Mat4.scale(0.5, 0.2, 0.8));
+
+// Draw the left shoe
+        this.shapes.rectangle.draw(
             context,
             program_state,
-            transform_moon,
-            this.materials.moon // Use maximum ambient and calculated color
+            left_shoe_transform,
+            this.materials.test.override({ ambient: 1, color: hex_color("#663300") }) // Use maximum ambient and shoe color
         );
 
-        this.planet_1 = transform_planet1;
-        this.planet_2 = transform_planet2;
-        this.planet_3 = transform_planet3;
-        this.planet_4 = transform_planet4;
-        this.moon = transform_moon;
+// Draw the right shoe
+        this.shapes.rectangle.draw(
+            context,
+            program_state,
+            right_shoe_transform,
+            this.materials.test.override({ ambient: 1, color: hex_color("#663300") }) // Use maximum ambient and shoe color
+        );
 
-        if(this.attached !== undefined) {
-            let desired = Mat4.inverse(this.attached().times(Mat4.translation(0, 0, 5)));
+
+
+
+
+        let desired;
+        if(this.attached && this.attached() !== null) {
+            desired = Mat4.inverse(this.attached().times(Mat4.translation(0, 0, 5)));
             desired.map((x,i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
             program_state.set_camera(desired);
+        }
+        else{
+            desired = this.initial_camera_location;
         }
 
 
@@ -412,215 +495,6 @@ class Ring_Shader extends Shader {
     }
 }
 
-
-
-/*
-        let a= t % animation_duration;
-        let r = (255).toString(16);
-        let g, b; // Declare g and b outside of the if-else blocks
-
-        if(a<3.5){
-            g = ("00" + (72.857*a).toString(16)).slice(-2);
-            b = ("00" + (72.857*a).toString(16)).slice(-2);
-        }
-
-        else{
-            g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-            b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-        }
-
-        let col = hex_color("#" + r + g + b);
-        */
-
-
-
-
-/*
-
-// Interpolate between red (255, 0, 0) and white (255, 255, 255)
-let start_color, end_color;
-
-if (progress < 0.5) {
-    start_color = [255, 0, 0]; // Red
-    end_color = [255, 255, 255]; // White
-} else {
-    start_color = [255, 0, 0]; // red
-    end_color = [255, 255, 255]; // white
-    progress = 1 - progress; // Reverse progress for the second half of the animation
-}
-
-// Linear interpolation for each color component (r, g, b)
-let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
-let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
-let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
-
-// Convert the RGB components to hexadecimal strings
-r = r.toString(16).padStart(2, '0');
-g = g.toString(16).padStart(2, '0');
-b = b.toString(16).padStart(2, '0');
-
-// Concatenate the hexadecimal components to form the color string
-let col = hex_color("#" + r + g + b);
-
- */
-
-
-
-
-
-/*
-let a= t % animation_duration;
-let r = (255).toString(16);
-let g, b; // Declare g and b outside of the if-else blocks
-
-if(a<3.5){
-    g = ("00" + (72.857*a).toString(16)).slice(-2);
-    b = ("00" + (72.857*a).toString(16)).slice(-2);
-}
-
-else{
-    g = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-    b = ("00" + (-72.857*a + 255).toString(16)).slice(-2);
-}
-
-let col = hex_color("#" + r + g + b);
-*/
-
-
-
-
-/*
-
-// Interpolate between red (255, 0, 0) and white (255, 255, 255)
-let start_color, end_color;
-
-if (progress < 0.5) {
-    start_color = [255, 0, 0]; // Red
-    end_color = [255, 255, 255]; // White
-} else {
-    start_color = [255, 0, 0]; // red
-    end_color = [255, 255, 255]; // white
-    progress = 1 - progress; // Reverse progress for the second half of the animation
-}
-
-// Linear interpolation for each color component (r, g, b)
-let r = Math.round(start_color[0] * (1 - progress*2) + end_color[0] * progress*2);
-let g = Math.round(start_color[1] * (1 - progress*2) + end_color[1] * progress*2);
-let b = Math.round(start_color[2] * (1 - progress*2) + end_color[2] * progress*2);
-
-// Convert the RGB components to hexadecimal strings
-r = r.toString(16).padStart(2, '0');
-g = g.toString(16).padStart(2, '0');
-b = b.toString(16).padStart(2, '0');
-
-// Concatenate the hexadecimal components to form the color string
-let col = hex_color("#" + r + g + b);
-
- */
-
-
-
-
-
-
-
-// TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
-
-
-
-// TODO: Create Planets (Requirement 1)
-
-
-/*
-// Calculate the progress of the animation (from 0 to 1)
-let progress = (t % animation_duration) / animation_duration;
-let start_radius = 1;
-let end_radius = 3;
-let radius;
-if(progress<0.5){
-    radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
-}
-else{
-    radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
-}
-*/
-
-//simplest interpolation
-/*
-let progress = (t % animation_duration) / animation_duration;
-let start_radius = 1;
-let end_radius = 3;
-let radius;
-
-if (progress < 0.5) {
-    radius = start_radius + 2 * progress * (end_radius - start_radius);
-} else {
-    radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
-}
- */
-
-
-
-/*
-        //interpolation method
-        let a= t % animation_duration;
-        let radius = 1;
-        if (a <= animation_duration / 2) {
-            radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
-        }
-        else {
-            radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
-        }
-*/
-
-
-
-
-
-
-
-
-/*
-// Calculate the progress of the animation (from 0 to 1)
-let progress = (t % animation_duration) / animation_duration;
-let start_radius = 1;
-let end_radius = 3;
-let radius;
-if(progress<0.5){
-    radius = start_radius * (1 - progress * 2) + end_radius * (progress * 2);
-}
-else{
-    radius = end_radius * (1 - (progress - 0.5) * 2) + start_radius * ((progress - 0.5) * 2);
-}
-*/
-
-//simplest interpolation
-/*
-let progress = (t % animation_duration) / animation_duration;
-let start_radius = 1;
-let end_radius = 3;
-let radius;
-
-if (progress < 0.5) {
-    radius = start_radius + 2 * progress * (end_radius - start_radius);
-} else {
-    radius = end_radius - 2 * (progress - 0.5) * (end_radius - start_radius);
-}
- */
-
-
-
-/*
-        //interpolation method
-        let a= t % animation_duration;
-        let radius = 1;
-        if (a <= animation_duration / 2) {
-            radius = 1 + 2 * a / (animation_duration / 2); // Swell from radius 1 to 3
-        }
-        else {
-            radius = 3 - 2 * (a - animation_duration / 2) / (animation_duration / 2); // Shrink from radius 3 to 1
-        }
-*/
 
 
 

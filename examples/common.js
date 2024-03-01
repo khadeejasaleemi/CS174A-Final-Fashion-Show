@@ -361,6 +361,7 @@ const Torus = defs.Torus =
         }
     }
 
+
 const Grid_Sphere = defs.Grid_Sphere =
     class Grid_Sphere extends Shape {
         // With lattitude / longitude divisions; this means singularities are at
