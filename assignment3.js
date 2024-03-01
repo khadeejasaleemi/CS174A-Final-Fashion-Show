@@ -4,6 +4,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
 
+
 export class Assignment3 extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
@@ -41,17 +42,33 @@ export class Assignment3 extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
+
+    get_random_color() {
+        const red = Math.floor(Math.random() * 256);
+        const green = Math.floor(Math.random() * 256);
+        const blue = Math.floor(Math.random() * 256);
+        return "#" + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
+    }
+
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("View solar system", ["Control", "0"], () => this.attached = () => null);
-        this.new_line();
-        this.key_triggered_button("Attach to planet 1", ["Control", "1"], () => this.attached = () => this.planet_1);
-        this.key_triggered_button("Attach to planet 2", ["Control", "2"], () => this.attached = () => this.planet_2);
-        this.new_line();
-        this.key_triggered_button("Attach to planet 3", ["Control", "3"], () => this.attached = () => this.planet_3);
-        this.key_triggered_button("Attach to planet 4", ["Control", "4"], () => this.attached = () => this.planet_4);
-        this.new_line();
-        this.key_triggered_button("Attach to moon", ["Control", "m"], () => this.attached = () => this.moon);
+        this.key_triggered_button("Change Shirt Color", ["s"], () => {
+            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
+            this.random_shirt = true;
+            this.random_shirt_color= this.get_random_color();
+        });
+        this.key_triggered_button("Change Pant Color", ["p"], () => {
+            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
+            this.random_pant = true;
+            this.random_pant_color= this.get_random_color();
+        });
+        this.key_triggered_button("Add hat", ["h"], () => {
+            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
+            this.hat= !this.hat;
+        });
+
+
+
     }
 
     display(context, program_state) {
@@ -77,23 +94,23 @@ export class Assignment3 extends Scene {
         let skin_color = hex_color("#C68863");
 
         // TODO: Lighting (Requirement 2)
-        const light_position = vec4(0, 0,0, 0);
+        const light_position = vec4(0, 0, 0, 0);
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [new Light(light_position, col, radius)];
 
 
         let head_transform = Mat4.identity().times(Mat4.scale(radius, radius, radius)); // Scale the sphere
-        head_transform = head_transform.times(Mat4.translation(0,2,0));
+        head_transform = head_transform.times(Mat4.translation(0, 2, 0));
         this.shapes.sphere.draw(
             context,
             program_state,
             head_transform,
-            this.materials.test.override({ ambient:1, color:skin_color}) // Use maximum ambient and calculated color
+            this.materials.test.override({ambient: 1, color: skin_color}) // Use maximum ambient and calculated color
         );
 
         // Define the transformation for the nose
-       // const nose_transform = head_transform.times(Mat4.translation(0, -0.2, radius)); // Translate the nose below the head
+        // const nose_transform = head_transform.times(Mat4.translation(0, -0.2, radius)); // Translate the nose below the head
 
 // Draw the nose using a tetrahedron shape
         /*
@@ -104,8 +121,6 @@ export class Assignment3 extends Scene {
             this.materials.test.override({ ambient: 1, color: hex_color("#8B4513") }) // Use maximum ambient and specified nose color
         );
          */
-
-
 
 
         const eye_color = hex_color("#000000");
@@ -123,7 +138,7 @@ export class Assignment3 extends Scene {
             context,
             program_state,
             left_eye_transform.times(Mat4.scale(eye_radius, eye_radius, eye_radius)), // Scale the eye
-            this.materials.test.override({ ambient: 1, color: eye_color }) // Use maximum ambient and specified eye color
+            this.materials.test.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
         );
 
 // Draw the right eye
@@ -131,7 +146,7 @@ export class Assignment3 extends Scene {
             context,
             program_state,
             right_eye_transform.times(Mat4.scale(eye_radius, eye_radius, eye_radius)), // Scale the eye
-            this.materials.test.override({ ambient: 1, color: eye_color }) // Use maximum ambient and specified eye color
+            this.materials.test.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
         );
 
         // Define the color for the white circle (white)
@@ -143,48 +158,58 @@ export class Assignment3 extends Scene {
             context,
             program_state,
             left_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
-            this.materials.test.override({ ambient: 1, color: white_color }) // Use maximum ambient and white circle color
+            this.materials.test.override({ambient: 1, color: white_color}) // Use maximum ambient and white circle color
         );
 
         this.shapes.circle.draw(
             context,
             program_state,
             right_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
-            this.materials.test.override({ ambient: 1, color: white_color }) // Use maximum ambient and white circle color
+            this.materials.test.override({ambient: 1, color: white_color}) // Use maximum ambient and white circle color
         );
 
 
-
-        const smile_transform = head_transform.times(Mat4.translation(0, -0.4, radius-0.05)); // Translate the smile
+        const smile_transform = head_transform.times(Mat4.translation(0, -0.4, radius - 0.05)); // Translate the smile
 
 // Draw the smile curve (bottom half of torus)
+
         this.shapes.torus.draw(
             context,
             program_state,
             smile_transform.times(Mat4.scale(0.3, 0.1, 0.2)), // Scale the smile to flatten it
-            this.materials.test.override({ ambient: 1, color: hex_color("#FF0000") }) // Use maximum ambient and red smile color
+            this.materials.test.override({ambient: 1, color: hex_color("#FF0000")}) // Use maximum ambient and red smile color
         );
 
-        let hat_transform = head_transform.times((Mat4.translation(0,0.5,0)));
+        let hat_transform = head_transform.times((Mat4.translation(0, 0.5, 0)));
 
 
-        this.shapes.sphere.draw(
-            context,
-            program_state,
-            hat_transform.times(Mat4.scale(1.2,0,1.2)),
-            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
-        );
+        if(this.hat) {
+            this.shapes.sphere.draw(
+                context,
+                program_state,
+                hat_transform.times(Mat4.scale(1.2, 0, 1.2)),
+                this.materials.test.override({ambient: 1, color: col}) // Use maximum ambient and calculated color
+            );
+        }
+
 
         let hat_bottom_transform = hat_transform.times(Mat4.scale(1.2, 0.6, 1.2)); // Same scale as the top of the hat
-        this.shapes.sphere.draw(
-            context,
-            program_state,
-            hat_bottom_transform,
-            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
-        );
+
+        if(this.hat) {
+            this.shapes.sphere.draw(
+                context,
+                program_state,
+                hat_bottom_transform,
+                this.materials.test.override({ambient: 1, color: col}) // Use maximum ambient and calculated color
+            );
+        }
 
         let body_transform = Mat4.identity().times(Mat4.scale(1,1,0.4));
-        let body_color = hex_color("#0000FF"); // Light brown
+        let body_color = hex_color("#0000FF");
+        if(this.random_shirt){
+            body_color = hex_color(this.random_shirt_color);
+        }
+
 
         this.shapes.rectangle.draw(
             context,
@@ -206,11 +231,16 @@ export class Assignment3 extends Scene {
         let leg_transform2 = Mat4.translation(-0.5,-2.2,0).times(Mat4.scale(0.4,1.2,1));
 
 
+        let leg_color= col;
+        if(this.random_pant){
+            leg_color = hex_color(this.random_pant_color);
+        }
+
         this.shapes.rectangle.draw(
             context,
             program_state,
             leg_transform1.times(body_transform),
-            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+            this.materials.test.override({ ambient:1, color:leg_color}) // Use maximum ambient and calculated color
         );
 
 
@@ -219,7 +249,7 @@ export class Assignment3 extends Scene {
             context,
             program_state,
             leg_transform2.times(body_transform),
-            this.materials.test.override({ ambient:1, color:col}) // Use maximum ambient and calculated color
+            this.materials.test.override({ ambient:1, color:leg_color}) // Use maximum ambient and calculated color
         );
 
         const arm_length = 1.5; // Length of the arm
