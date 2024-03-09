@@ -171,6 +171,7 @@ export class Test_Data {
             ground: new Texture("assets/ground.png"),
             ground2: new Texture("assets/ground2.png"),
             skin: new Texture("assets/skin.png"),
+            dressTexture: new Texture("assets/dress_texture.png"),
         }
         this.shapes = {
             donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),
