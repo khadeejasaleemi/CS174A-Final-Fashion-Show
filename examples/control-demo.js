@@ -1,6 +1,8 @@
 import {defs, tiny} from './common.js';
+import {Body, Test_Data} from "./collisions-demo.js";
+
 // Pull these names into this module's scope for convenience:
-const {vec3, vec4, vec, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 
 export class Shape_From_File extends Shape {                                   // **Shape_From_File** is a versatile standalone Shape that imports
                                                                                // all its arrays' data from an .obj 3D model file.
@@ -101,105 +103,102 @@ export class Shape_From_File extends Shape {                                   /
         if (this.ready)
             super.draw(context, program_state, model_transform, material);
     }
+
+
 }
 
-export class Obj_File_Demo extends Scene {                           // **Obj_File_Demo** show how to load a single 3D model from an OBJ file.
-                                                                     // Detailed model files can be used in place of simpler primitive-based
-                                                                     // shapes to add complexity to a scene.  Simpler primitives in your scene
-                                                                     // can just be thought of as placeholders until you find a model file
-                                                                     // that fits well.  This demo shows the teapot model twice, with one
-                                                                     // teapot showing off the Fake_Bump_Map effect while the other has a
-                                                                     // regular texture and Phong lighting.
+
+export class Control_Demo extends Scene {
+    // ** Inertia_Demo** demonstration: This scene lets random initial momentums
+    // carry several bodies until they fall due to gravity and bounce.
     constructor() {
         super();
-        // Load the model file:
-
+        this.data = new Test_Data();
         this.shapes = {
             face: new Shape_From_File("assets/face.obj"),
-            torus: new defs.Torus(15, 15),
-            torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(4),
-            sphere1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
-            sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
-            sphere3: new defs.Subdivision_Sphere(3),
-            circle: new defs.Regular_2D_Polygon(1, 15),
-            ring: new defs.Torus(50, 50),
-            rectangle: new defs.Cube(),
             square: new defs.Square(),
-            cylinder: new defs.Cylindrical_Tube(),
-            triangle: new defs.Triangle(),
-
-            // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-            //        (Requirement 1)
         };
-        //this.shapes = {"face": new Shape_From_File("assets/face.obj")};
+        const shader = new defs.Fake_Bump_Map(1);
+
 
 
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
-                {ambient: 0.3, diffusivity: 0.5, specularity: 0, color: color(0.878, 0.675, 0.412,1 )})
+                {ambient: 0.3, diffusivity: 0.5, specularity: 0, color: color(0.878, 0.675, 0.412,1 )}),
+            floor: new Material(shader, {color: color(0, 0, 0, 1), ambient: .5, texture: this.data.textures.stars}),
         }
-        this.position_horizontal = 0;
+
+        // The agent
+        this.agent = this.shapes.face;
+        this.agent_pos = vec3(0, -4, 0);
+        this.agent_size = 5.0;
+
+        this.control = {};
+        this.control.w = false;
+        this.control.a = false;
+        this.control.s = false;
+        this.control.d = false;
+        this.control.space = false;
     }
+
+
     make_control_panel() {
-        this.key_triggered_button("Move right", ["r"], () => {
-            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
-            this.position_horizontal += 1;
-        });
-
-        this.key_triggered_button("Move left", ["r"], () => {
-            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
-            this.position_horizontal -= 1;
-        });
+        super.make_control_panel();
+        this.new_line();
+        this.key_triggered_button("Foward", ["Shift", "W"],
+            () => this.control.w = true, '#6E6460', () => this.control.w = false);
+        this.key_triggered_button("Back",   ["Shift", "S"],
+            () => this.control.s = true, '#6E6460', () => this.control.s = false);
+        this.key_triggered_button("Left",   ["Shift", "A"],
+            () => this.control.a = true, '#6E6460', () => this.control.a = false);
+        this.key_triggered_button("Right",  ["Shift", "D"],
+            () => this.control.d = true, '#6E6460', () => this.control.d = false);
+        this.key_triggered_button("Speed Up",  ["Shift", " "],
+            () => this.control.space = true, '#6E6460', () => this.control.space = false);
     }
 
-
+    update_state(dt) {
+        // update_state():  Override the base time-stepping code to say what this particular
+        // Control
+        let speed = 10.0;
+        if (this.control.space)
+            speed *= 3;
+        if (this.control.w) {
+            this.agent_pos[2] -= dt * speed;
+        }
+        if (this.control.s) {
+            this.agent_pos[2] += dt * speed;
+        }
+        if (this.control.a) {
+            this.agent_pos[0] -= dt * speed;
+        }
+        if (this.control.d) {
+            this.agent_pos[0] += dt * speed;
+        }
+    }
 
     display(context, program_state) {
-        const t = program_state.animation_time;
-        program_state.set_camera(Mat4.translation(0, 0, -5));    // Locate the camera here (inverted matrix).
+        // display(): Draw everything else in the scene besides the moving bodies.
+
+
+        if (!context.scratchpad.controls) {
+            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(new defs.Program_State_Viewer());
+            program_state.set_camera(Mat4.translation(0, 0, -50));    // Locate the camera here (inverted matrix).
+        }
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
-        const light_position = vec4(0, 3, 10, 1);
-        program_state.lights = [new Light(light_position, color(1, .7, .7, 1), 100000)];
-
-        const eye_radius = 0.03; // Radius of the eyes
-        const eye_offset = 0.10; // Offset of the eyes from the center of the head
-        let eye_color = color(0,0,0,1);
-        const left_eye_transform = Mat4.translation(-eye_offset + this.position_horizontal/1.5, -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius));
-        const right_eye_transform = Mat4.translation(eye_offset + this.position_horizontal/1.5, -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius)); // Translate right eye
-        /*
-        this.shapes.sphere.draw(
-            context,
-            program_state,
-            left_eye_transform, // Scale the eye
-            this.materials.test.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
-        );
-
-         */
-
-        this.shapes.square.draw(
-            context,
-            program_state,
-            Mat4.translation(0, -10, 0)
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0))
-                .times(Mat4.scale(50, 50, 1)),
-            this.materials.test.override({ambient: 0.8, texture: new Texture("assets/stars.png", "LINEAR_MIPMAP_LINEAR")})
-        );
-        /*
-        this.shapes.sphere.draw(
-            context,
-            program_state,
-            right_eye_transform, // Scale the eye
-            this.materials.test.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
-        );
-         */
+        program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
+        // Draw the ground:
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
+            this.materials.floor.override({ambient:.8, texture: this.data.textures.grid}));
 
 
-        let face_transform = Mat4.translation(this.position_horizontal, 0, 0).times(Mat4.scale(0.3 ,0.3,0.3));
-        this.shapes.face.draw(context, program_state, face_transform, this.materials.test);
+        let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]).
+            times(Mat4.scale(this.agent_size,this.agent_size,this.agent_size));
 
-
-
+        this.agent.draw(context, program_state, agent_trans, this.materials.test);
     }
+
 
 }
