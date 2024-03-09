@@ -186,7 +186,7 @@ export class Control_Demo extends Simulation {
         const shader = new defs.Fake_Bump_Map(1);
         this.material = new Material(shader, {
             color: color(0, 0, 0, 1),
-            ambient: .5, texture: this.data.textures.stars
+            ambient: .5
         })
         // The agent
         this.agent = new Shape_From_File("assets/face.obj");
@@ -310,12 +310,83 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
 
 
+        let agent_loc = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]);
+        let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
+            .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
+            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size));
 
+        const eye_radius = 0.2; // Radius of the eyes
+        const eye_offset = 0.6; // Offset of the eyes from the center of the head
+        let eye_color = color(0,0,0,1);
+        let white =color(1,1,1,1) ;
 
-        let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]).
-        times(Mat4.scale(this.agent_size,this.agent_size,this.agent_size));
+// Apply the agent transformation to the eye transformation
+        let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset, -0.2, -0.6)
+            .times(Mat4.scale(0.16, 0.16, 0.16)));
+        let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset, -0.2, -0.6)
+            .times(Mat4.scale(0.16, 0.16, 0.16)));
+        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, -0.2, -0.50)
+            .times(Mat4.scale(0.3, 0.2, 0.2)));
+        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.50)
+            .times(Mat4.scale(0.3, 0.2, 0.2)));
 
         this.agent.draw(context, program_state, agent_trans, this.new_material);
+
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            left_eye_transform, // Scale the eye
+            this.material.override({ ambient: 0, color: eye_color }) // Use maximum ambient and specified eye color
+        );
+
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            right_white_eye_transform, // Scale the eye
+            this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
+        );
+
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            right_eye_transform, // Scale the eye
+            this.material.override({ ambient: 0, color: eye_color }) // Use maximum ambient and specified eye color
+        );
+
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            left_white_eye_transform, // Scale the eye
+            this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
+        );
+
+
+
+        /*
+        let agent_loc =  Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]);
+        let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]).times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis.times(Mat4.scale(this.agent_size,this.agent_size,this.agent_size));
+
+        const eye_radius = 0.2; // Radius of the eyes
+        const eye_offset = 3.7; // Offset of the eyes from the center of the head
+        let eye_color = color(0,0,0,1);
+        let left_eye_transform = Mat4.translation(-eye_offset , -4.2, 3).times(Mat4.scale(0.15,0.15,0.15).times(agent_trans));
+        //let left_eye_transform =Mat4.translation(-eye_offset , -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius)).times(agent_loc);
+        const right_eye_transform = agent_loc.times(Mat4.translation(eye_offset , -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius))); // Translate right eye
+
+
+
+        this.agent.draw(context, program_state, agent_trans, this.new_material);
+        this.shapes.sphere.draw(
+            context,
+            program_state,
+            left_eye_transform, // Scale the eye
+            this.material.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
+        );
+
+         */
+
+
+
 
 
     }
