@@ -139,6 +139,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
             test: new Material(new defs.Phong_Shader(),
                 {ambient: 0.3, diffusivity: 0.5, specularity: 0, color: color(0.878, 0.675, 0.412,1 )})
         }
+
         this.position_horizontal = 0;
     }
     make_control_panel() {
