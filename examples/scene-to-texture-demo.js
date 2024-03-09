@@ -40,10 +40,13 @@ export class Scene_To_Texture_Demo extends Scene {                   // **Scene_
         this.spin = 0;
         this.cube_1 = Mat4.translation(-2, 0, 0);
         this.cube_2 = Mat4.translation(2, 0, 0);
+        this.player_position = 1;
     }
 
     make_control_panel() {
         this.key_triggered_button("Cube rotation", ["c"], () => this.spin ^= 1);
+        this.key_triggered_button("Move Right", ["r"], () => this.player_position -= 1);
+
 
         this.live_string(box => {
             box.textContent = this.spin
@@ -57,6 +60,8 @@ export class Scene_To_Texture_Demo extends Scene {                   // **Scene_
     display(context, program_state) {                                 // display():  Draw both scenes, clearing the buffer in between.
         program_state.lights = [new Light(vec4(-5, 5, 5, 1), color(0, 1, 1, 1), 100000)];
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+
+
 
         program_state.set_camera(Mat4.look_at(vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0)));
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, .5, 500);
@@ -86,5 +91,9 @@ export class Scene_To_Texture_Demo extends Scene {                   // **Scene_
         // Draw Scene 2:
         this.shapes.box.draw(context, program_state, this.cube_1, this.materials.b);
         this.shapes.box_2.draw(context, program_state, this.cube_2, this.materials.c);
+
+
+
+
     }
 }

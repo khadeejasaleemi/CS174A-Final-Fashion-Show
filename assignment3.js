@@ -23,6 +23,7 @@ export class Assignment3 extends Scene {
             rectangle: new defs.Cube(),
             cylinder: new defs.Cylindrical_Tube(),
             triangle: new defs.Triangle(),
+
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -38,7 +39,7 @@ export class Assignment3 extends Scene {
 
 
         }
-
+        this.position_horizontal = 0;
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
@@ -48,6 +49,7 @@ export class Assignment3 extends Scene {
         const green = Math.floor(Math.random() * 256);
         const blue = Math.floor(Math.random() * 256);
         return "#" + ((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1);
+
     }
 
     make_control_panel() {
@@ -66,6 +68,17 @@ export class Assignment3 extends Scene {
             // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
             this.hat= !this.hat;
         });
+
+        this.key_triggered_button("Move right", ["r"], () => {
+            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
+            this.position_horizontal += 1;
+        });
+
+        this.key_triggered_button("Move left", ["r"], () => {
+            // TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
+            this.position_horizontal -= 1;
+        });
+
 
 
 
@@ -105,7 +118,7 @@ export class Assignment3 extends Scene {
         this.shapes.sphere.draw(
             context,
             program_state,
-            head_transform,
+            head_transform.times(Mat4.translation(this.position_horizontal,0,0)),
             this.materials.test.override({ambient: 1, color: skin_color}) // Use maximum ambient and calculated color
         );
 
@@ -157,14 +170,14 @@ export class Assignment3 extends Scene {
         this.shapes.circle.draw(
             context,
             program_state,
-            left_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
+            left_eye_transform.times(Mat4.scale(0.2, 0.15, 0)).times(Mat4.translation(this.position_horizontal,0,0)),// Scale the circle
             this.materials.test.override({ambient: 1, color: white_color}) // Use maximum ambient and white circle color
         );
 
         this.shapes.circle.draw(
             context,
             program_state,
-            right_eye_transform.times(Mat4.scale(0.2, 0.15, 0)),// Scale the circle
+            right_eye_transform.times(Mat4.scale(0.2, 0.15, 0)).times(Mat4.translation(this.position_horizontal,0,0)),// Scale the circle
             this.materials.test.override({ambient: 1, color: white_color}) // Use maximum ambient and white circle color
         );
 
