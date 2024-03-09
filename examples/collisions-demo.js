@@ -164,8 +164,12 @@ export class Test_Data {
             rgb: new Texture("assets/rgb.jpg"),
             earth: new Texture("assets/earth.gif"),
             grid: new Texture("assets/grid.png"),
+            sky: new Texture("assets/sky.png"),
             stars: new Texture("assets/stars.png"),
             text: new Texture("assets/text.png"),
+            wall: new Texture("assets/wall.png"),
+            ground: new Texture("assets/ground.png"),
+            ground2: new Texture("assets/ground2.png")
         }
         this.shapes = {
             donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),

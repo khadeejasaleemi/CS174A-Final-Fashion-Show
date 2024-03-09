@@ -165,8 +165,24 @@ export class Control_Demo extends Simulation {
         super();
         this.data = new Test_Data();
         //this.face = new Shape_From_File("assets/face.obj");
-        this.shapes = Object.assign({}, this.data.shapes);
-        this.shapes.square = new defs.Square();
+
+        this.shapes = {
+            torus: new defs.Torus(15, 15),
+            torus2: new defs.Torus(3, 15),
+            sphere: new defs.Subdivision_Sphere(4),
+            sphere1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
+            sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
+            sphere3: new defs.Subdivision_Sphere(3),
+            circle: new defs.Regular_2D_Polygon(1, 15),
+            ring: new defs.Torus(50, 50),
+            rectangle: new defs.Cube(),
+            square: new defs.Square(),
+            cylinder: new defs.Cylindrical_Tube(),
+            triangle: new defs.Triangle(),
+
+        };
+        //this.shapes = Object.assign({}, this.data.shapes);
+        //this.shapes.square = new defs.Square();
         const shader = new defs.Fake_Bump_Map(1);
         this.material = new Material(shader, {
             color: color(0, 0, 0, 1),
@@ -190,6 +206,8 @@ export class Control_Demo extends Simulation {
             specularity: 0,
             color: color(0.878, 0.675, 0.412, 1)
         });
+
+        this.speed = 10;
     }
 
     random_color() {
@@ -199,16 +217,18 @@ export class Control_Demo extends Simulation {
     make_control_panel() {
         super.make_control_panel();
         this.new_line();
-        this.key_triggered_button("Foward", ["Shift", "W"],
+        this.key_triggered_button("Back", ["Shift", "W"],
             () => this.control.w = true, '#6E6460', () => this.control.w = false);
-        this.key_triggered_button("Back",   ["Shift", "S"],
+        this.key_triggered_button("Forward",   ["Shift", "S"],
             () => this.control.s = true, '#6E6460', () => this.control.s = false);
         this.key_triggered_button("Left",   ["Shift", "A"],
             () => this.control.a = true, '#6E6460', () => this.control.a = false);
         this.key_triggered_button("Right",  ["Shift", "D"],
             () => this.control.d = true, '#6E6460', () => this.control.d = false);
         this.key_triggered_button("Speed Up",  ["Shift", " "],
-            () => this.control.space = true, '#6E6460', () => this.control.space = false);
+            () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
+        this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
+            () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
     }
 
     update_state(dt) {
@@ -216,20 +236,26 @@ export class Control_Demo extends Simulation {
         // scene should do to its bodies every frame -- including applying forces.
         // Generate additional moving bodies if there ever aren't enough:
         // Control
-        let speed = 10.0;
-        if (this.control.space)
-            speed *= 3;
+        //let speed = 10.0;
+
+        if (this.control.speed_up){
+            this.speed *= 1.2;
+        }
+        if (this.control.speed_up){
+            this.speed /= 1.2;
+        }
+
         if (this.control.w) {
-            this.agent_pos[2] -= dt * speed;
+            this.agent_pos[2] -= dt * this.speed;
         }
         if (this.control.s) {
-            this.agent_pos[2] += dt * speed;
+            this.agent_pos[2] += dt * this.speed;
         }
         if (this.control.a) {
-            this.agent_pos[0] -= dt * speed;
+            this.agent_pos[0] -= dt * this.speed;
         }
         if (this.control.d) {
-            this.agent_pos[0] += dt * speed;
+            this.agent_pos[0] += dt * this.speed;
         }
 
 
@@ -245,16 +271,53 @@ export class Control_Demo extends Simulation {
             program_state.set_camera(Mat4.translation(0, 0, -50));    // Locate the camera here (inverted matrix).
         }
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
-        program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
+        //program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
+
+// Define light parameters
+        const light_position1 = vec4(0, -10, 0, 1); // Adjust position as needed
+        const light_position2 = vec4(0, 3, -5, 1); // Adjust position as needed
+        const light_color = color(1, 1, 1, 1); // Adjust color as needed
+        const light_intensity = 1000000; // Adjust intensity as needed
+
+// Create the light object
+
+        const light1 = new Light(light_position1, light_color, light_intensity);
+        const light2 = new Light(light_position2, light_color, light_intensity);
+
+// Set the light for the program state
+        program_state.lights = [light1, light2];
+
         // Draw the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
-            this.material.override({ambient:.8, texture: this.data.textures.grid}));
+            this.material.override({ambient:.8, texture: this.data.textures.ground2}));
+
+        this.shapes.square.draw(context, program_state, Mat4.translation(50, 10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+            this.material.override({ambient:.8, texture: this.data.textures.wall}));
+
+        this.shapes.square.draw(context, program_state, Mat4.translation(-50, 10 ,0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+            this.material.override({ambient:.8, texture: this.data.textures.wall}));
+
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, 10, -25)
+                .times(Mat4.rotation(Math.PI, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+            this.material.override({ambient:.8, texture: this.data.textures.wall}));
+
+
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, 30, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
+            this.material.override({ambient:.8, texture: this.data.textures.sky}));
+
+
+
 
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]).
         times(Mat4.scale(this.agent_size,this.agent_size,this.agent_size));
 
         this.agent.draw(context, program_state, agent_trans, this.new_material);
+
+
     }
 
     // show_explanation(document_element) {

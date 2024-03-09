@@ -134,7 +134,6 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         };
         //this.shapes = {"face": new Shape_From_File("assets/face.obj")};
 
-
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
                 {ambient: 0.3, diffusivity: 0.5, specularity: 0, color: color(0.878, 0.675, 0.412,1 )})
@@ -168,7 +167,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         let eye_color = color(0,0,0,1);
         const left_eye_transform = Mat4.translation(-eye_offset + this.position_horizontal/1.5, -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius));
         const right_eye_transform = Mat4.translation(eye_offset + this.position_horizontal/1.5, -0.1, 2).times(Mat4.scale(eye_radius, eye_radius*1.2, eye_radius)); // Translate right eye
-        /*
+
         this.shapes.sphere.draw(
             context,
             program_state,
@@ -176,7 +175,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
             this.materials.test.override({ambient: 1, color: eye_color}) // Use maximum ambient and specified eye color
         );
 
-         */
+
 
         this.shapes.square.draw(
             context,
