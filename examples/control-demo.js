@@ -4,8 +4,23 @@ import {Body, Test_Data} from "./collisions-demo.js";
 // Pull these names into this module's scope for convenience:
 //const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 const {vec3, vec4, vec, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+
+export class BoundingBox {
+    constructor(min, max) {
+        this.min = min; // vec3(x, y, z)
+        this.max = max; // vec3(x, y, z)
+    }
+
+    // Check if this bounding box intersects with another
+    intersects(other) {
+        return (
+            this.min[0] <= other.max[0] && this.max[0] >= other.min[0] &&
+            this.min[1] <= other.max[1] && this.max[1] >= other.min[1] &&
+            this.min[2] <= other.max[2] && this.max[2] >= other.min[2]
+        );
+    }
+}
 export class Shape_From_File extends Shape {                                   // **Shape_From_File** is a versatile standalone Shape that imports
-                                                                               // all its arrays' data from an .obj 3D model file.
     constructor(filename) {
         super("position", "normal", "texture_coord");
         // Begin downloading the mesh. Once that completes, return
@@ -208,6 +223,18 @@ export class Control_Demo extends Simulation {
         });
 
         this.speed = 10;
+
+        // Define bounding boxes for walls and the head
+        // (collisions against walls were found with some trial and error by adjusting coords)
+        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 25));  // Adjusted to be slightly inward
+        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 25));   // Adjusted to be slightly inward
+        this.wallBack = new BoundingBox(vec3(-49.5, -10, -18), vec3(49.5, 30, -18));
+        this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
+
+        // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
+        // The negative x-direction is to the left, and the positive x-direction is to the right
+        this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
+        this.headEarRightBox = new BoundingBox(vec3(2, -5, -1), vec3(3.5, -3, 1));   // Extended outward on the right
     }
 
     random_color() {
@@ -231,6 +258,30 @@ export class Control_Demo extends Simulation {
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
     }
 
+    willCollide(newPos) {
+        let newHeadMainBox = new BoundingBox(
+            vec3(newPos[0] + this.headMainBox.min[0], newPos[1] + this.headMainBox.min[1], newPos[2] + this.headMainBox.min[2]),
+            vec3(newPos[0] + this.headMainBox.max[0], newPos[1] + this.headMainBox.max[1], newPos[2] + this.headMainBox.max[2])
+        );
+        let newHeadEarLeftBox = new BoundingBox(
+            vec3(newPos[0] + this.headEarLeftBox.min[0], newPos[1] + this.headEarLeftBox.min[1], newPos[2] + this.headEarLeftBox.min[2]),
+            vec3(newPos[0] + this.headEarLeftBox.max[0], newPos[1] + this.headEarLeftBox.max[1], newPos[2] + this.headEarLeftBox.max[2])
+        );
+        let newHeadEarRightBox = new BoundingBox(
+            vec3(newPos[0] + this.headEarRightBox.min[0], newPos[1] + this.headEarRightBox.min[1], newPos[2] + this.headEarRightBox.min[2]),
+            vec3(newPos[0] + this.headEarRightBox.max[0], newPos[1] + this.headEarRightBox.max[1], newPos[2] + this.headEarRightBox.max[2])
+        );
+
+        return this.wallLeft.intersects(newHeadMainBox) ||
+            this.wallRight.intersects(newHeadMainBox) ||
+            this.wallBack.intersects(newHeadMainBox) ||
+            this.wallLeft.intersects(newHeadEarLeftBox) ||
+            this.wallRight.intersects(newHeadEarLeftBox) ||
+            this.wallBack.intersects(newHeadEarLeftBox) ||
+            this.wallLeft.intersects(newHeadEarRightBox) ||
+            this.wallRight.intersects(newHeadEarRightBox) ||
+            this.wallBack.intersects(newHeadEarRightBox);
+    }
     update_state(dt) {
         // update_state():  Override the base time-stepping code to say what this particular
         // scene should do to its bodies every frame -- including applying forces.
@@ -245,16 +296,16 @@ export class Control_Demo extends Simulation {
             this.speed /= 1.2;
         }
 
-        if (this.control.w) {
+        if (this.control.w && !this.willCollide(vec3(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2] - dt * this.speed))) {
             this.agent_pos[2] -= dt * this.speed;
         }
-        if (this.control.s) {
+        if (this.control.s && !this.willCollide(vec3(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2] + dt * this.speed))) {
             this.agent_pos[2] += dt * this.speed;
         }
-        if (this.control.a) {
+        if (this.control.a && !this.willCollide(vec3(this.agent_pos[0] - dt * this.speed, this.agent_pos[1], this.agent_pos[2]))) {
             this.agent_pos[0] -= dt * this.speed;
         }
-        if (this.control.d) {
+        if (this.control.d && !this.willCollide(vec3(this.agent_pos[0] + dt * this.speed, this.agent_pos[1], this.agent_pos[2]))) {
             this.agent_pos[0] += dt * this.speed;
         }
 
@@ -274,8 +325,8 @@ export class Control_Demo extends Simulation {
         //program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
 
 // Define light parameters
-        const light_position1 = vec4(0, -10, 0, 1); // Adjust position as needed
-        const light_position2 = vec4(0, 3, -5, 1); // Adjust position as needed
+        const light_position1 = vec4(0, -10, 50, 1); // Adjust position as needed (front light)
+        const light_position2 = vec4(0, 3, -5, 1); // Adjust position as needed (middle left)
         const light_color = color(1, 1, 1, 1); // Adjust color as needed
         const light_intensity = 1000000; // Adjust intensity as needed
 
@@ -318,7 +369,7 @@ export class Control_Demo extends Simulation {
         const eye_radius = 0.2; // Radius of the eyes
         const eye_offset = 0.6; // Offset of the eyes from the center of the head
         let eye_color = color(0,0,0,1);
-        let white =color(1,1,1,1) ;
+        let white = color(1,1,1,1) ;
 
 // Apply the agent transformation to the eye transformation
         let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset, -0.2, -0.6)
