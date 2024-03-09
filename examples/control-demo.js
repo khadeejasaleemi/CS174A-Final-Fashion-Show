@@ -241,6 +241,7 @@ export class Control_Demo extends Simulation {
         this.control.s = false;
         this.control.d = false;
         this.control.space = false;
+        this.shirt1 = new Shape_From_File("assets/shirt.obj");
 
         this.new_material = new Material(new defs.Phong_Shader(), {
             ambient: 0.5,
@@ -373,8 +374,8 @@ export class Control_Demo extends Simulation {
         let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
             .times(Mat4.scale(0.3, 0.2, 0.2)));
 
-        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.wall}));
-
+        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.shirt1.draw(context, program_state, agent_trans.times(Mat4.translation(-4,0,0)),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         this.shapes.sphere.draw(
             context,
             program_state,
