@@ -222,6 +222,9 @@ export class Control_Demo extends Simulation {
             square: new defs.Square(),
             cylinder: new defs.Cylindrical_Tube(),
             triangle: new defs.Triangle(),
+            leg1: new defs.Cube(),
+            leg2: new defs.Cube(),
+            test_body: new defs.Cube(),
         };
         //this.shapes = Object.assign({}, this.data.shapes);
         //this.shapes.square = new defs.Square();
@@ -249,6 +252,29 @@ export class Control_Demo extends Simulation {
             color: color(0.878, 0.675, 0.412, 1),
         });
 
+        //THE FOLLOWING MATERIALS ARE FOR THE LEGS
+
+        this.leg1_material = new Material(new defs.Phong_Shader(), {
+            ambient: 1.0,
+            diffusivity: 0.5,
+            specularity: 0,
+            color: color(.678, .847, .902, 1),
+        });
+
+        this.leg2_material = new Material(new defs.Phong_Shader(), {
+            ambient: 1.0,
+            diffusivity: 0.5,
+            specularity: 0,
+            color: color(.501, 0., 0., 1),
+        });
+
+        this.test_body_material = new Material(new defs.Phong_Shader(), {
+            ambient: 1.0,
+            diffusivity: 0.5,
+            specularity: 0,
+            color: color(1., 1., 1., 1),
+        });
+
         this.speed = 10;
     }
 
@@ -271,6 +297,7 @@ export class Control_Demo extends Simulation {
             () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
         this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
+
     }
 
     update_state(dt) {
@@ -352,11 +379,23 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
 
-
-
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
-            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size));
+            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size)).times(Mat4.translation(0, 4, 0));
+
+        //THE FOLLOWING CODE IS FOR LEG TESTING
+
+        if (this.control.w) {
+            agent_trans = agent_trans.times(Mat4.rotation(Math.PI, 0, 1, 0));
+        }
+        if (this.control.s) {
+            agent_trans = agent_trans.times(Mat4.rotation(0, 0, 1, 0));
+        }
+        if (this.control.a) {
+            agent_trans = agent_trans.times(Mat4.rotation(3/2*Math.PI, 0, 1, 0));
+        }
+        if (this.control.d) {
+            agent_trans = agent_trans.times(Mat4.rotation(1/2*Math.PI, 0, 1, 0));}
 
         const eye_radius = 0.2; // Radius of the eyes
         const eye_offset = 0.6; // Offset of the eyes from the center of the head
@@ -373,7 +412,7 @@ export class Control_Demo extends Simulation {
         let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
             .times(Mat4.scale(0.3, 0.2, 0.2)));
 
-        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.wall}));
+        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.stars}));
 
         this.shapes.sphere.draw(
             context,
@@ -402,6 +441,41 @@ export class Control_Demo extends Simulation {
             left_white_eye_transform, // Scale the eye
             this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
         );
+
+        //THE FOLLOWING CODE IS FOR LEG TESTING
+
+        let test_body_transform = agent_trans.times(Mat4.translation(0,-2.5,0))
+            .times(Mat4.scale(1, 1, .5));
+
+        let leg1_transform = agent_trans.times(Mat4.translation(-.5,-5,0))
+            .times(Mat4.scale(.5, 1.5, .5));
+
+        let leg2_transform = agent_trans.times(Mat4.translation(.5,-5,0))
+            .times(Mat4.scale(.5, 1.5, .5));
+
+
+        this.shapes.test_body.draw(
+            context,
+            program_state,
+            test_body_transform,
+            this.test_body_material
+        );
+
+        this.shapes.leg1.draw(
+            context,
+            program_state,
+            leg1_transform,
+            this.leg1_material
+        );
+
+        this.shapes.leg2.draw(
+            context,
+            program_state,
+            leg2_transform,
+            this.leg2_material
+        );
+
+
 
         /*
         // Draw the rectangle
