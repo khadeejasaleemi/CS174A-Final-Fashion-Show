@@ -185,6 +185,8 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
                 .times(Mat4.scale(50, 50, 1)),
             this.materials.test.override({ambient: 0.8, texture: new Texture("assets/stars.png", "LINEAR_MIPMAP_LINEAR")})
         );
+
+
         /*
         this.shapes.sphere.draw(
             context,

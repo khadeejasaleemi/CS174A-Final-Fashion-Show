@@ -104,6 +104,49 @@ export class Shape_From_File extends Shape {                                   /
             super.draw(context, program_state, model_transform, material);
     }
 }
+
+export class Text_Line extends Shape {                           // **Text_Line** embeds text in the 3D world, using a crude texture
+                                                                 // method.  This Shape is made of a horizontal arrangement of quads.
+                                                                 // Each is textured over with images of ASCII characters, spelling
+                                                                 // out a string.  Usage:  Instantiate the Shape with the desired
+                                                                 // character line width.  Then assign it a single-line string by calling
+                                                                 // set_string("your string") on it. Draw the shape on a material
+                                                                 // with full ambient weight, and text.png assigned as its texture
+                                                                 // file.  For multi-line strings, repeat this process and draw with
+                                                                 // a different matrix.
+    constructor(max_size) {
+        super("position", "normal", "texture_coord");
+        this.max_size = max_size;
+        var object_transform = Mat4.identity();
+        for (var i = 0; i < max_size; i++) {                                       // Each quad is a separate Square instance:
+            defs.Square.insert_transformed_copy_into(this, [], object_transform);
+            object_transform.post_multiply(Mat4.translation(1.5, 0, 0));
+        }
+    }
+
+    set_string(line, context) {           // set_string():  Call this to overwrite the texture coordinates buffer with new
+        // values per quad, which enclose each of the string's characters.
+        this.arrays.texture_coord = [];
+        for (var i = 0; i < this.max_size; i++) {
+            var row = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) / 16),
+                col = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) % 16);
+
+            var skip = 3, size = 32, sizefloor = size - skip;
+            var dim = size * 16,
+                left = (col * size + skip) / dim, top = (row * size + skip) / dim,
+                right = (col * size + sizefloor) / dim, bottom = (row * size + sizefloor + 5) / dim;
+
+            this.arrays.texture_coord.push(...Vector.cast([left, 1 - bottom], [right, 1 - bottom],
+                [left, 1 - top], [right, 1 - top]));
+        }
+        if (!this.existing) {
+            this.copy_onto_graphics_card(context);
+            this.existing = true;
+        } else
+            this.copy_onto_graphics_card(context, ["texture_coord"], false);
+    }
+}
+
 export class Simulation extends Scene {
     // **Simulation** manages the stepping of simulation time.  Subclass it when making
     // a Scene that is a physics demo.  This technique is careful to totally decouple
@@ -175,11 +218,10 @@ export class Control_Demo extends Simulation {
             sphere3: new defs.Subdivision_Sphere(3),
             circle: new defs.Regular_2D_Polygon(1, 15),
             ring: new defs.Torus(50, 50),
-            rectangle: new defs.Cube(),
+            cube: new defs.Cube(),
             square: new defs.Square(),
             cylinder: new defs.Cylindrical_Tube(),
             triangle: new defs.Triangle(),
-
         };
         //this.shapes = Object.assign({}, this.data.shapes);
         //this.shapes.square = new defs.Square();
@@ -201,10 +243,10 @@ export class Control_Demo extends Simulation {
         this.control.space = false;
 
         this.new_material = new Material(new defs.Phong_Shader(), {
-            ambient: 0.3,
+            ambient: 0.5,
             diffusivity: 0.5,
             specularity: 0,
-            color: color(0.878, 0.675, 0.412, 1)
+            color: color(0.878, 0.675, 0.412, 1),
         });
 
         this.speed = 10;
@@ -241,7 +283,7 @@ export class Control_Demo extends Simulation {
         if (this.control.speed_up){
             this.speed *= 1.2;
         }
-        if (this.control.speed_up){
+        if (this.control.slow_down){
             this.speed /= 1.2;
         }
 
@@ -287,10 +329,11 @@ export class Control_Demo extends Simulation {
 // Set the light for the program state
         program_state.lights = [light1, light2];
 
-        // Draw the ground:
+        //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
             this.material.override({ambient:.8, texture: this.data.textures.ground2}));
+
 
         this.shapes.square.draw(context, program_state, Mat4.translation(50, 10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
@@ -310,7 +353,7 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
 
 
-        let agent_loc = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]);
+
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
             .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size));
@@ -325,12 +368,12 @@ export class Control_Demo extends Simulation {
             .times(Mat4.scale(0.16, 0.16, 0.16)));
         let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset, -0.2, -0.6)
             .times(Mat4.scale(0.16, 0.16, 0.16)));
-        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, -0.2, -0.50)
+        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, -0.2, -0.48)
             .times(Mat4.scale(0.3, 0.2, 0.2)));
-        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.50)
+        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
             .times(Mat4.scale(0.3, 0.2, 0.2)));
 
-        this.agent.draw(context, program_state, agent_trans, this.new_material);
+        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.wall}));
 
         this.shapes.sphere.draw(
             context,
@@ -360,7 +403,18 @@ export class Control_Demo extends Simulation {
             this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
         );
 
+        /*
+        // Draw the rectangle
+        const rectangle_transform = Mat4.translation(0, 0, -1).times(Mat4.scale(2, 1, 1)); // Position and scale the rectangle
+        this.shapes.square.draw(context, program_state, rectangle_transform, eye_color);
 
+        // Draw the text "Fashion Show" on the front side of the rectangle
+        const text_transform = Mat4.translation(-0.5, 0.5, -1).times(Mat4.scale(0.1, 0.1, 0.1)); // Position and scale the text
+        let string = "Fashion Show";
+        this.shapes.text.set_string(string, context.context);
+        this.shapes.text.draw(context, program_state, text_transform, this.text_image);
+
+         */
 
         /*
         let agent_loc =  Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2]);

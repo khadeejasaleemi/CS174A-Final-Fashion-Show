@@ -67,35 +67,21 @@ export class Text_Demo extends Scene {             // **Text_Demo** is a scene w
     }
 
     display(context, program_state) {
+        // Set up lights and camera
         program_state.lights = [new Light(vec4(3, 2, 1, 0), color(1, 1, 1, 1), 1000000),
             new Light(vec4(3, 10, 10, 1), color(1, .7, .7, 1), 100000)];
         program_state.set_camera(Mat4.look_at(...Vector.cast([0, 0, 4], [0, 0, 0], [0, 1, 0])));
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
-        const t = program_state.animation_time / 1000;
-        const funny_orbit = Mat4.rotation(Math.PI / 4 * t, Math.cos(t), Math.sin(t), .7 * Math.cos(t));
-        this.shapes.cube.draw(context, program_state, funny_orbit, this.grey);
+        // Draw the rectangle
+        const rectangle_transform = Mat4.translation(0, 0, -1).times(Mat4.scale(2, 1, 1)); // Position and scale the rectangle
+        this.shapes.cube.draw(context, program_state, rectangle_transform, this.grey);
 
-
-        let strings = ["This is some text", "More text", "1234567890", "This is a line.\n\n\n" + "This is another line.",
-            Text_Line.toString(), Text_Line.toString()];
-
-        // Sample the "strings" array and draw them onto a cube.
-        for (let i = 0; i < 3; i++)
-            for (let j = 0; j < 2; j++) {             // Find the matrix for a basis located along one of the cube's sides:
-                let cube_side = Mat4.rotation(i == 0 ? Math.PI / 2 : 0, 1, 0, 0)
-                    .times(Mat4.rotation(Math.PI * j - (i == 1 ? Math.PI / 2 : 0), 0, 1, 0))
-                    .times(Mat4.translation(-.9, .9, 1.01));
-
-                const multi_line_string = strings[2 * i + j].split('\n');
-                // Draw a Text_String for every line in our string, up to 30 lines:
-                for (let line of multi_line_string.slice(0, 30)) {             // Assign the string to Text_String, and then draw it.
-                    this.shapes.text.set_string(line, context.context);
-                    this.shapes.text.draw(context, program_state, funny_orbit.times(cube_side)
-                        .times(Mat4.scale(.03, .03, .03)), this.text_image);
-                    // Move our basis down a line.
-                    cube_side.post_multiply(Mat4.translation(0, -.06, 0));
-                }
-            }
+        // Draw the text "Fashion Show" on the front side of the rectangle
+        const text_transform = Mat4.translation(-0.5, 0.5, -1).times(Mat4.scale(0.1, 0.1, 0.1)); // Position and scale the text
+        let string = "Fashion Show";
+        this.shapes.text.set_string(string, context.context);
+        this.shapes.text.draw(context, program_state, text_transform, this.text_image);
     }
+
 }
