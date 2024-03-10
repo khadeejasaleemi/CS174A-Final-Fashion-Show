@@ -115,7 +115,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         // Load the model file:
 
         this.shapes = {
-            face: new Shape_From_File("assets/face.obj"),
+            face: new Shape_From_File("assets/face_old.obj"),
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(4),
@@ -132,7 +132,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
-        //this.shapes = {"face": new Shape_From_File("assets/face.obj")};
+        //this.shapes = {"face": new Shape_From_File("assets/face_old.obj")};
 
         this.materials = {
             test: new Material(new defs.Phong_Shader(),

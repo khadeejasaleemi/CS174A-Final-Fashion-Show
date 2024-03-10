@@ -222,7 +222,7 @@ export class Control_Demo extends Simulation {
     constructor() {
         super();
         this.data = new Test_Data();
-        //this.face = new Shape_From_File("assets/face.obj");
+        //this.face = new Shape_From_File("assets/face_old.obj");
 
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -259,8 +259,13 @@ export class Control_Demo extends Simulation {
         this.control.s = false;
         this.control.d = false;
         this.control.space = false;
-        this.shirt1 = new Shape_From_File("assets/shirt.obj");
-        this.dress = new Shape_From_File("assets/dress.obj");
+
+        this.clothing = {
+            shirt1: new Shape_From_File("assets/shirt.obj"),
+            dress: new Shape_From_File("assets/dress.obj"),
+        }
+
+        this.hair = new Shape_From_File("assets/hair.obj");
         this.stand = new Shape_From_File("assets/stand.obj");
 
         this.new_material = new Material(new defs.Phong_Shader(), {
@@ -433,6 +438,7 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
 
+
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
             .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size)).times(Mat4.translation(0, 4, 0));
@@ -457,21 +463,46 @@ export class Control_Demo extends Simulation {
         let white = color(1,1,1,1) ;
 
 // Apply the agent transformation to the eye transformation
-        let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset, -0.2, -0.6)
-            .times(Mat4.scale(0.16, 0.16, 0.16)));
-        let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset, -0.2, -0.6)
-            .times(Mat4.scale(0.16, 0.16, 0.16)));
-        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, -0.2, -0.48)
-            .times(Mat4.scale(0.3, 0.2, 0.2)));
-        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
-            .times(Mat4.scale(0.3, 0.2, 0.2)));
+        let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.06, 0.2, -0.65)
+            .times(Mat4.scale(0.16, 0.16, 0.2)));
+        let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.06, 0.2, -0.65)
+            .times(Mat4.scale(0.16, 0.16, 0.2)));
+        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, 0.2, -0.6)
+            .times(Mat4.scale(0.25, 0.16, 0.2)));
+        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, 0.2, -0.6)
+            .times(Mat4.scale(0.25, 0.16, 0.2)));
 
 
         this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
-        this.shirt1.draw(context, program_state, agent_trans.times(Mat4.translation(-4,2,0)),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
-        this.dress.draw(context, program_state, agent_trans.times(Mat4.translation(4,1.0,0)).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
-        this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(-4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
-        this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        //this.shirt1.draw(context, program_state, Mat4.translation(-4,-2,0),  this.material.override({ambient:.8, texture: this.data.textures.shirt_texture}));
+        //this.dress.draw(context, program_state, Mat4.translation(4,-2,0).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        this.hair.draw(context, program_state, agent_trans.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
+
+
+        /*
+        for (let x = -30; x <= 40; x += 30) {
+            // Loop over z coordinates
+            for (let z = -10; z <= 50; z += 25) {
+                // Translate each stand to its position and draw it
+                this.stand.draw(
+                    context,
+                    program_state,
+                    Mat4.translation(x, -5, z).times(Mat4.scale(5, 5, 5)),
+                    this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
+                );
+                //need a matrix of translations
+                this.clothing.dress.draw(
+                    context,
+                    program_state,
+                    Mat4.translation(x, -3, z).times(Mat4.scale(5, 5, 5)),
+                    this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
+                );
+            }
+        }
+
+         */
+        //this.stand.draw(context, program_state, Mat4.translation(-4,-4,0).times(Mat4.scale(4,4,4)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        //this.stand.draw(context, program_state,Mat4.translation(4,-4.4,0),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
 
         this.shapes.sphere.draw(
             context,
