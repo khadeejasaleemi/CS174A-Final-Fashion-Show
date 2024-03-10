@@ -244,6 +244,9 @@ export class Control_Demo extends Simulation {
         this.control.s = false;
         this.control.d = false;
         this.control.space = false;
+        this.shirt1 = new Shape_From_File("assets/shirt.obj");
+        this.dress = new Shape_From_File("assets/dress.obj");
+        this.stand = new Shape_From_File("assets/stand.obj");
 
         this.new_material = new Material(new defs.Phong_Shader(), {
             ambient: 0.5,
@@ -412,7 +415,12 @@ export class Control_Demo extends Simulation {
         let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
             .times(Mat4.scale(0.3, 0.2, 0.2)));
 
-        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.stars}));
+
+        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.shirt1.draw(context, program_state, agent_trans.times(Mat4.translation(-4,2,0)),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.dress.draw(context, program_state, agent_trans.times(Mat4.translation(4,1.0,0)).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(-4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
 
         this.shapes.sphere.draw(
             context,
