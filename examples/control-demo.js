@@ -269,6 +269,9 @@ export class Control_Demo extends Simulation {
         this.stand = new Shape_From_File("assets/stand.obj");
         this.smile = new Shape_From_File("assets/smile.obj");
         this.neck = new Shape_From_File("assets/neck.obj");
+        this.body = new Shape_From_File("assets/body.obj");
+        this.leg = new Shape_From_File("assets/leg.obj");
+
 
         this.new_material = new Material(new defs.Phong_Shader(), {
             ambient: 0.5,
@@ -481,10 +484,12 @@ export class Control_Demo extends Simulation {
         //this.dress.draw(context, program_state, Mat4.translation(4,-2,0).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
         this.hair.draw(context, program_state, agent_trans.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
         this.smile.draw(context, program_state, agent_trans.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
-        this.neck.draw(context, program_state, agent_trans.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.4,0.4,0.4))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.neck.draw(context, program_state, agent_trans.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.body.draw(context, program_state, agent_trans.times(Mat4.translation(0,-2.4,0).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.leg.draw(context, program_state, agent_trans.times(Mat4.translation(0.3,-4,-0.22).times(Mat4.scale(0.7,0.9,0.7)).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.leg.draw(context, program_state, agent_trans.times(Mat4.translation(-0.3,-4,-0.22).times(Mat4.scale(0.7,0.9,0.7)).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
-
-
+        /*
         for (let x = -30; x <= 40; x += 30) {
             // Loop over z coordinates
             for (let z = -10; z <= 50; z += 25) {
@@ -504,6 +509,8 @@ export class Control_Demo extends Simulation {
                 );
             }
         }
+
+         */
 
 
         //this.stand.draw(context, program_state, Mat4.translation(-4,-4,0).times(Mat4.scale(4,4,4)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
@@ -538,7 +545,7 @@ export class Control_Demo extends Simulation {
         );
 
         //THE FOLLOWING CODE IS FOR LEG TESTING
-
+/*
         let test_body_transform = agent_trans.times(Mat4.translation(0,-2.5,0))
             .times(Mat4.scale(1, 1, .5));
 
@@ -556,6 +563,8 @@ export class Control_Demo extends Simulation {
             this.test_body_material
         );
 
+
+
         this.shapes.leg1.draw(
             context,
             program_state,
@@ -571,7 +580,7 @@ export class Control_Demo extends Simulation {
         );
 
 
-
+*/
         /*
         // Draw the rectangle
         const rectangle_transform = Mat4.translation(0, 0, -1).times(Mat4.scale(2, 1, 1)); // Position and scale the rectangle
