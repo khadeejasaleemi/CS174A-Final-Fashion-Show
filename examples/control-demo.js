@@ -269,7 +269,7 @@ export class Control_Demo extends Simulation {
         this.stand = new Shape_From_File("assets/stand.obj");
         this.smile = new Shape_From_File("assets/smile.obj");
         this.neck = new Shape_From_File("assets/neck.obj");
-        this.body = new Shape_From_File("assets/body.obj");
+        this.body = new Shape_From_File("assets/body_new.obj");
         this.leg = new Shape_From_File("assets/leg.obj");
 
 
@@ -481,7 +481,23 @@ export class Control_Demo extends Simulation {
         let smile_color = color(0.6,0,0,1);
         this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         //this.shirt1.draw(context, program_state, Mat4.translation(-4,-2,0),  this.material.override({ambient:.8, texture: this.data.textures.shirtTexture}));
-        //this.dress.draw(context, program_state, Mat4.translation(4,-2,0).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        /*
+        this.clothing.dress.draw(
+            context,
+            program_state,
+            agent_trans.times(
+                Mat4.translation(0,-3.3,0)
+            ).times(
+                Mat4.rotation(-Math.PI/2, 0, 1, 0)
+            ).times(
+                Mat4.scale(1.5,1.5,1.5)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+
+         */
+
+
         this.hair.draw(context, program_state, agent_trans.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
         this.smile.draw(context, program_state, agent_trans.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
         this.neck.draw(context, program_state, agent_trans.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
