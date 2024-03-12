@@ -446,7 +446,7 @@ export class Control_Demo extends Simulation {
 
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
-            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size)).times(Mat4.translation(0, 4, 0));
+            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size*0.7)).times(Mat4.translation(0, 4, 0));
 
         //THE FOLLOWING CODE IS FOR LEG TESTING
 
@@ -481,21 +481,21 @@ export class Control_Demo extends Simulation {
         let smile_color = color(0.6,0,0,1);
         this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         //this.shirt1.draw(context, program_state, Mat4.translation(-4,-2,0),  this.material.override({ambient:.8, texture: this.data.textures.shirtTexture}));
-        /*
+
         this.clothing.dress.draw(
             context,
             program_state,
             agent_trans.times(
-                Mat4.translation(0,-3.3,0)
+                Mat4.translation(0,-2.5,-0.1)
             ).times(
-                Mat4.rotation(-Math.PI/2, 0, 1, 0)
+                Mat4.rotation(-Math.PI/1.7, 0, 1, 0)
             ).times(
-                Mat4.scale(1.5,1.5,1.5)
+                Mat4.scale(1,1,1)
             ),
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );
 
-         */
+
 
 
         this.hair.draw(context, program_state, agent_trans.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
