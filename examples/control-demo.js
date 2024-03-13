@@ -307,13 +307,14 @@ export class Control_Demo extends Simulation {
 
         // Define bounding boxes for walls and the head
         // (collisions against walls were found with some trial and error by adjusting coords)
-        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 25));  // Adjusted to be slightly inward
-        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 25));   // Adjusted to be slightly inward
+        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 50));  // Adjusted to be slightly inward
+        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 30));   // Adjusted to be slightly inward
         this.wallBack = new BoundingBox(vec3(-49.5, -10, -18), vec3(49.5, 30, -18));
+        this.wallFront = new BoundingBox(vec3(-50, -10, 45), vec3(50, 30, 47));
         this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
 
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
-        // The negative x-direction is to the left, and the positive x-direction is to the right
+        // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
         this.headEarRightBox = new BoundingBox(vec3(2, -5, -1), vec3(3.5, -3, 1));   // Extended outward on the right
     }
@@ -357,6 +358,7 @@ export class Control_Demo extends Simulation {
         return this.wallLeft.intersects(newHeadMainBox) ||
             this.wallRight.intersects(newHeadMainBox) ||
             this.wallBack.intersects(newHeadMainBox) ||
+            this.wallFront.intersects(newHeadMainBox) ||
             this.wallLeft.intersects(newHeadEarLeftBox) ||
             this.wallRight.intersects(newHeadEarLeftBox) ||
             this.wallBack.intersects(newHeadEarLeftBox) ||
