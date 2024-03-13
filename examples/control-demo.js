@@ -240,6 +240,7 @@ export class Control_Demo extends Simulation {
             leg1: new defs.Cube(),
             leg2: new defs.Cube(),
             test_body: new defs.Cube(),
+            world: new defs.Subdivision_Sphere(4),
         };
         //this.shapes = Object.assign({}, this.data.shapes);
         //this.shapes.square = new defs.Square();
@@ -270,27 +271,31 @@ export class Control_Demo extends Simulation {
             color: color(0.878, 0.675, 0.412, 1),
         });
 
-        //THE FOLLOWING MATERIALS ARE FOR THE LEGS
-
         this.leg1_material = new Material(new defs.Phong_Shader(), {
             ambient: 1.0,
             diffusivity: 0.5,
             specularity: 0,
-            color: color(.678, .847, .902, 1),
+            color: color(0, .3, 0, 1),
         });
 
         this.leg2_material = new Material(new defs.Phong_Shader(), {
             ambient: 1.0,
             diffusivity: 0.5,
             specularity: 0,
-            color: color(.501, 0., 0., 1),
+            color: color(.3, 0., 0., 1),
         });
 
-        this.test_body_material = new Material(new defs.Phong_Shader(), {
+        this.body_material = new Material(new defs.Phong_Shader(), {
             ambient: 1.0,
             diffusivity: 0.5,
             specularity: 0,
             color: color(1., 1., 1., 1),
+        });
+        this.world_material = new Material(new defs.Phong_Shader(), {
+            ambient: 1.0,
+            diffusivity: 0,
+            specularity: 0,
+            color: color(0.5294, 0.8078, 0.9216, 1),
         });
 
         this.speed = 10;
@@ -362,10 +367,14 @@ export class Control_Demo extends Simulation {
         //let speed = 10.0;
 
         if (this.control.speed_up){
-            this.speed *= 1.2;
+            this.speed += 1.2;
+            if (this.speed > 46)
+                this.speed = 46;
         }
         if (this.control.slow_down){
-            this.speed /= 1.2;
+            this.speed -= 1.2;
+            if (this.speed <= 0)
+                this.speed = 1.2;
         }
 
         if (this.control.w && !this.willCollide(vec3(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2] - dt * this.speed))) {
@@ -410,6 +419,19 @@ export class Control_Demo extends Simulation {
 // Set the light for the program state
         program_state.lights = [light1, light2];
 
+        //the time
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+
+        //the world
+        let world_matrix = Mat4.scale(200, 200, 200).times(Mat4.identity());
+
+        this.shapes.world.draw(
+            context,
+            program_state,
+            world_matrix,
+            this.world_material
+        );
+
         //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
@@ -437,19 +459,6 @@ export class Control_Demo extends Simulation {
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
             .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size)).times(Mat4.translation(0, 4, 0));
 
-        //THE FOLLOWING CODE IS FOR LEG TESTING
-
-        if (this.control.w) {
-            agent_trans = agent_trans.times(Mat4.rotation(Math.PI, 0, 1, 0));
-        }
-        if (this.control.s) {
-            agent_trans = agent_trans.times(Mat4.rotation(0, 0, 1, 0));
-        }
-        if (this.control.a) {
-            agent_trans = agent_trans.times(Mat4.rotation(3/2*Math.PI, 0, 1, 0));
-        }
-        if (this.control.d) {
-            agent_trans = agent_trans.times(Mat4.rotation(1/2*Math.PI, 0, 1, 0));}
 
         const eye_radius = 0.2; // Radius of the eyes
         const eye_offset = 0.6; // Offset of the eyes from the center of the head
@@ -467,7 +476,6 @@ export class Control_Demo extends Simulation {
             .times(Mat4.scale(0.3, 0.2, 0.2)));
 
 
-        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         this.shirt1.draw(context, program_state, agent_trans.times(Mat4.translation(-4,2,0)),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         this.dress.draw(context, program_state, agent_trans.times(Mat4.translation(4,1.0,0)).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
         this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(-4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
@@ -501,38 +509,100 @@ export class Control_Demo extends Simulation {
             this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
         );
 
-        //THE FOLLOWING CODE IS FOR LEG TESTING
+        //walking implementation
+        let head_transform = Mat4.identity();
 
-        let test_body_transform = agent_trans.times(Mat4.translation(0,-2.5,0))
-            .times(Mat4.scale(1, 1, .5));
+        let body_transform = Mat4.translation(0,-2.25,0).times(Mat4.scale(1, 1, .5));
 
-        let leg1_transform = agent_trans.times(Mat4.translation(-.5,-5,0))
-            .times(Mat4.scale(.5, 1.5, .5));
+        let leg1_transform = Mat4.translation(-.5,-4.25,0);
 
-        let leg2_transform = agent_trans.times(Mat4.translation(.5,-5,0))
-            .times(Mat4.scale(.5, 1.5, .5));
+        let leg2_transform = Mat4.translation(.5,-4.25,0);
+        
+        let leg_rotation_factor = -2.25; //should be half the size of the head
+        let leg_movement_height = .3; //how high the legs rotate upward while walking
+        let leg_movement_speed = 5; //how quickly the legs oscillate while walking
 
+        if (this.speed > 12.4) {
+            leg_movement_speed = 9;
+            leg_movement_height = .5;
+        }
+        else if (this.speed < 7.6) {
+            leg_movement_speed = 1;
+            leg_movement_height = .2;
+            }
+
+        if (this.control.s) {
+            head_transform = Mat4.rotation(0, 0, 1, 0);
+            body_transform = Mat4.rotation(0, 0, 1, 0).times(body_transform);
+            leg1_transform = Mat4.translation(-.5,-2.0,0)
+                .times(Mat4.rotation(leg_movement_height*Math.sin(leg_movement_speed*t), 1, 0, 0))
+                .times(Mat4.translation(0,leg_rotation_factor,0)); //translate wrt head first to obtain correct angle of rotation
+            leg2_transform = Mat4.translation(.5,-2.0,0)
+                .times(Mat4.rotation(-leg_movement_height*Math.sin(leg_movement_speed*t), 1, 0, 0))
+                .times(Mat4.translation(0,leg_rotation_factor,0)); 
+        }
+
+        if (this.control.w) {
+            head_transform = Mat4.rotation(Math.PI, 0, 1,  0);
+            body_transform = Mat4.rotation(Math.PI, 0, 1,  0).times(body_transform);
+            leg2_transform = Mat4.translation(-.5,-2.0,0)
+                .times(Mat4.rotation(-leg_movement_height*Math.sin(leg_movement_speed*t), 1, 0, 0))
+                .times(Mat4.translation(0,leg_rotation_factor,0));
+            leg1_transform = Mat4.translation(.5,-2.0,0)
+                .times(Mat4.rotation(leg_movement_height*Math.sin(leg_movement_speed*t), 1, 0, 0))
+                .times(Mat4.translation(0,leg_rotation_factor,0));
+        }
+        
+        if (this.control.a) {
+            head_transform = Mat4.rotation(3/2*Math.PI, 0, 1, 0);
+            body_transform = Mat4.rotation(3/2*Math.PI, 0, 1, 0).times(body_transform);
+            leg1_transform = Mat4.translation(0,-2.0,0)
+                .times(Mat4.rotation(-leg_movement_height*Math.sin(leg_movement_speed*t), 0, 0, 1))
+                .times(Mat4.translation(0,leg_rotation_factor,-.5));
+            leg2_transform = Mat4.translation(0,-2.0,0)
+                .times(Mat4.rotation(leg_movement_height*Math.sin(leg_movement_speed*t), 0, 0, 1))
+                .times(Mat4.translation(0,leg_rotation_factor,.5));
+        }
+        
+        if (this.control.d) {
+            head_transform = Mat4.rotation(1/2*Math.PI, 0, 1, 0);
+            body_transform = Mat4.rotation(1/2*Math.PI, 0, 1, 0).times(body_transform);
+            leg2_transform = Mat4.translation(0, -2.0, 0)
+                .times(Mat4.rotation(leg_movement_height * Math.sin(leg_movement_speed * t), 0, 0, 1))
+                .times(Mat4.translation(0, leg_rotation_factor, -.5));
+            leg1_transform = Mat4.translation(0, -2.0, 0)
+                .times(Mat4.rotation(-leg_movement_height * Math.sin(leg_movement_speed * t), 0, 0, 1))
+                .times(Mat4.translation(0, leg_rotation_factor, .5));
+        }
 
         this.shapes.test_body.draw(
             context,
             program_state,
-            test_body_transform,
-            this.test_body_material
+            agent_trans.times(body_transform),
+            this.body_material
         );
 
         this.shapes.leg1.draw(
             context,
             program_state,
-            leg1_transform,
+            agent_trans.times(leg1_transform).times(Mat4.scale(.5, 1, .5)),
             this.leg1_material
         );
 
         this.shapes.leg2.draw(
             context,
             program_state,
-            leg2_transform,
+            agent_trans.times(leg2_transform).times(Mat4.scale(.5, 1, .5)),
             this.leg2_material
         );
+
+        this.agent.draw(
+            context,
+            program_state,
+            agent_trans.times(head_transform),
+            this.material.override({ambient:.8, texture: this.data.textures.skin})
+        );
+
 
 
 
