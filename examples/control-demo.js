@@ -222,7 +222,7 @@ export class Control_Demo extends Simulation {
     constructor() {
         super();
         this.data = new Test_Data();
-        //this.face = new Shape_From_File("assets/face.obj");
+        //this.face = new Shape_From_File("assets/face_old.obj");
 
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -260,9 +260,21 @@ export class Control_Demo extends Simulation {
         this.control.s = false;
         this.control.d = false;
         this.control.space = false;
-        this.shirt1 = new Shape_From_File("assets/shirt.obj");
-        this.dress = new Shape_From_File("assets/dress.obj");
+
+        this.clothing = {
+            shirt: new Shape_From_File("assets/shirt.obj"),
+            dress: new Shape_From_File("assets/dress.obj"),
+            dress2: new Shape_From_File("assets/dress2.obj"),
+            shirt1: new Shape_From_File("assets/shirt1.obj"),
+        }
+
+        this.hair = new Shape_From_File("assets/hair.obj");
         this.stand = new Shape_From_File("assets/stand.obj");
+        this.smile = new Shape_From_File("assets/smile.obj");
+        this.neck = new Shape_From_File("assets/neck.obj");
+        this.body = new Shape_From_File("assets/body_new.obj");
+        this.leg = new Shape_From_File("assets/leg.obj");
+
 
         this.new_material = new Material(new defs.Phong_Shader(), {
             ambient: 0.5,
@@ -302,13 +314,14 @@ export class Control_Demo extends Simulation {
 
         // Define bounding boxes for walls and the head
         // (collisions against walls were found with some trial and error by adjusting coords)
-        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 25));  // Adjusted to be slightly inward
-        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 25));   // Adjusted to be slightly inward
+        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 50));  // Adjusted to be slightly inward
+        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 30));   // Adjusted to be slightly inward
         this.wallBack = new BoundingBox(vec3(-49.5, -10, -18), vec3(49.5, 30, -18));
+        this.wallFront = new BoundingBox(vec3(-50, -10, 45), vec3(50, 30, 47));
         this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
 
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
-        // The negative x-direction is to the left, and the positive x-direction is to the right
+        // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
         this.headEarRightBox = new BoundingBox(vec3(2, -5, -1), vec3(3.5, -3, 1));   // Extended outward on the right
     }
@@ -352,6 +365,7 @@ export class Control_Demo extends Simulation {
         return this.wallLeft.intersects(newHeadMainBox) ||
             this.wallRight.intersects(newHeadMainBox) ||
             this.wallBack.intersects(newHeadMainBox) ||
+            this.wallFront.intersects(newHeadMainBox) ||
             this.wallLeft.intersects(newHeadEarLeftBox) ||
             this.wallRight.intersects(newHeadEarLeftBox) ||
             this.wallBack.intersects(newHeadEarLeftBox) ||
@@ -434,30 +448,31 @@ export class Control_Demo extends Simulation {
 
         //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.ground2}));
 
 
-        this.shapes.square.draw(context, program_state, Mat4.translation(50, 10, 0)
-                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+        this.shapes.square.draw(context, program_state, Mat4.translation(100, 30, 0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.wall}));
 
-        this.shapes.square.draw(context, program_state, Mat4.translation(-50, 10 ,0)
-                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+        this.shapes.square.draw(context, program_state, Mat4.translation(-100, 30 ,0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.wall}));
 
-        this.shapes.square.draw(context, program_state, Mat4.translation(0, 10, -25)
-                .times(Mat4.rotation(Math.PI, 0, 1, 0)).times(Mat4.scale(50, 20, 1)),
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, 30, -25)
+                .times(Mat4.rotation(Math.PI, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.wall}));
 
 
-        this.shapes.square.draw(context, program_state, Mat4.translation(0, 30, 0)
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
+
 
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
-            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size)).times(Mat4.translation(0, 4, 0));
+            .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size*0.6)).times(Mat4.translation(0, 4, 0));
 
 
         const eye_radius = 0.2; // Radius of the eyes
@@ -466,20 +481,130 @@ export class Control_Demo extends Simulation {
         let white = color(1,1,1,1) ;
 
 // Apply the agent transformation to the eye transformation
-        let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset, -0.2, -0.6)
-            .times(Mat4.scale(0.16, 0.16, 0.16)));
-        let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset, -0.2, -0.6)
-            .times(Mat4.scale(0.16, 0.16, 0.16)));
-        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.07, -0.2, -0.48)
-            .times(Mat4.scale(0.3, 0.2, 0.2)));
-        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.07, -0.2, -0.48)
-            .times(Mat4.scale(0.3, 0.2, 0.2)));
+        let left_eye_transform = agent_trans.times(Mat4.translation(eye_offset+0.06, 0.1, -0.65)
+            .times(Mat4.scale(0.16, 0.16, 0.2)));
+        let right_eye_transform = agent_trans.times(Mat4.translation(-eye_offset-0.06, 0.1, -0.65)
+            .times(Mat4.scale(0.16, 0.16, 0.2)));
+        let right_white_eye_transform = agent_trans.times(Mat4.translation(-eye_offset - 0.1, 0.1, -0.6)
+            .times(Mat4.scale(0.25, 0.16, 0.2)));
+        let left_white_eye_transform = agent_trans.times(Mat4.translation(eye_offset + 0.1, 0.1, -0.6)
+            .times(Mat4.scale(0.25, 0.16, 0.2)));
 
 
+<<<<<<< HEAD
         this.shirt1.draw(context, program_state, agent_trans.times(Mat4.translation(-4,2,0)),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
         this.dress.draw(context, program_state, agent_trans.times(Mat4.translation(4,1.0,0)).times(Mat4.rotation(-Math.PI/2, 0, 1, 0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
         this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(-4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
         this.stand.draw(context, program_state, agent_trans.times(Mat4.translation(4,0,0)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+=======
+        let smile_color = color(0.6,0,0,1);
+        this.agent.draw(context, program_state, agent_trans,  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+
+
+
+
+        /*
+        this.clothing.dress.draw(
+            context,
+            program_state,
+            agent_trans.times(
+                Mat4.translation(0,-2.5,-0.1)
+            ).times(
+                Mat4.rotation(-Math.PI/1.7, 0, 1, 0)
+            ).times(
+                Mat4.scale(1,1,1)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+        */
+
+        /*
+        this.clothing.dress2.draw(
+            context,
+            program_state,
+            agent_trans.times(
+                Mat4.translation(0,1.65,0)
+            ).times(
+                Mat4.rotation(Math.PI/2, 0, 1, 0)
+            ).times(
+                Mat4.scale(6,6,7.5)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+
+
+         */
+
+        /*
+
+        this.clothing.shirt1.draw(
+            context,
+            program_state,
+            agent_trans.times(
+                Mat4.translation(0,-1.7,0)
+            ).times(
+                Mat4.rotation(Math.PI/2, 0, 1, 0)
+            ).times(
+                Mat4.scale(1,1,1)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+        */
+
+
+        let transformationList = [ agent_trans.times(
+            Mat4.translation(0,-2.5,-0.1)
+        ).times(
+            Mat4.rotation(-Math.PI/1.7, 0, 1, 0)
+        ).times(
+            Mat4.scale(1,1,1)
+        )];
+        let clothingList = [this.clothing.dress];
+
+
+
+        this.hair.draw(context, program_state, agent_trans.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
+        this.smile.draw(context, program_state, agent_trans.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
+        this.neck.draw(context, program_state, agent_trans.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.body.draw(context, program_state, agent_trans.times(Mat4.translation(0,-2.4,0).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.leg.draw(context, program_state, agent_trans.times(Mat4.translation(0.3,-4,-0.22).times(Mat4.scale(0.7,0.9,0.7)).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
+        this.leg.draw(context, program_state, agent_trans.times(Mat4.translation(-0.3,-4,-0.22).times(Mat4.scale(0.7,0.9,0.7)).times(Mat4.rotation(Math.PI / 2, 0, 1, 0))), this.material.override({ambient:.8, texture: this.data.textures.skin}));
+
+
+        for (let x = -30; x <= 40; x += 30) {
+            // Loop over z coordinates
+            for (let z = -10; z <= 50; z += 25) {
+                // Translate each stand to its position and draw it
+                let stand_location = Mat4.translation(x, -4, z);
+                this.stand.draw(
+                    context,
+                    program_state,
+                    stand_location.times(Mat4.scale(5, 6, 5)),
+                    this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
+                );
+                //need a matrix of translations
+                clothingList[0].draw(
+                    context,
+                    program_state,
+                    Mat4.translation(x, 2, z).times(transformationList[0]),
+                    this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
+                );
+            }
+        }
+
+        /*
+        this.clothing.dress.draw(
+            context,
+            program_state,
+            Mat4.translation(x, -3, z).times(Mat4.scale(5, 5, 5)),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
+        );
+
+         */
+
+        //this.stand.draw(context, program_state, Mat4.translation(-4,-4,0).times(Mat4.scale(4,4,4)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+        //this.stand.draw(context, program_state,Mat4.translation(4,-4.4,0),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
+>>>>>>> 538178f7a0901e753e09e0d46487d2b2ac421255
 
         this.shapes.sphere.draw(
             context,
@@ -509,10 +634,17 @@ export class Control_Demo extends Simulation {
             this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
         );
 
+<<<<<<< HEAD
         //walking implementation
         let head_transform = Mat4.identity();
 
         let body_transform = Mat4.translation(0,-2.25,0).times(Mat4.scale(1, 1, .5));
+=======
+        //THE FOLLOWING CODE IS FOR LEG TESTING
+/*
+        let test_body_transform = agent_trans.times(Mat4.translation(0,-2.5,0))
+            .times(Mat4.scale(1, 1, .5));
+>>>>>>> 538178f7a0901e753e09e0d46487d2b2ac421255
 
         let leg1_transform = Mat4.translation(-.5,-4.25,0);
 
@@ -582,6 +714,8 @@ export class Control_Demo extends Simulation {
             this.body_material
         );
 
+
+
         this.shapes.leg1.draw(
             context,
             program_state,
@@ -605,7 +739,7 @@ export class Control_Demo extends Simulation {
 
 
 
-
+*/
         /*
         // Draw the rectangle
         const rectangle_transform = Mat4.translation(0, 0, -1).times(Mat4.scale(2, 1, 1)); // Position and scale the rectangle
