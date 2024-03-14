@@ -266,6 +266,10 @@ export class Control_Demo extends Simulation {
             dress: new Shape_From_File("assets/dress.obj"),
             dress2: new Shape_From_File("assets/dress2.obj"),
             shirt1: new Shape_From_File("assets/shirt1.obj"),
+            shirt2: new Shape_From_File("assets/shirt2.obj"),
+            shirt3: new Shape_From_File("assets/shirt3.obj"),
+            shirt4: new Shape_From_File("assets/shirt4.obj"),
+            pant: new Shape_From_File("assets/pant.obj"),
         }
 
         this.hair = new Shape_From_File("assets/hair.obj");
@@ -550,7 +554,7 @@ export class Control_Demo extends Simulation {
         else if (this.speed < 7.6) {
             leg_movement_speed = 1;
             leg_movement_height = .2;
-            }
+        }
 
         if (this.control.s) {
             head_transform = Mat4.rotation(0, 0, 1, 0);
@@ -574,7 +578,7 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.rotation(leg_movement_height*Math.sin(leg_movement_speed*t), 1, 0, 0))
                 .times(Mat4.translation(0,leg_rotation_factor,0)).times(Mat4.rotation(Math.PI * 3/2, 0, 1, 0));
         }
-        
+
         if (this.control.a) {
             head_transform = Mat4.rotation(3/2*Math.PI, 0, 1, 0);
             body_transform = Mat4.rotation(3/2*Math.PI, 0, 1, 0).times(body_transform);
@@ -586,7 +590,7 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.translation(0,leg_rotation_factor,0)).times(Mat4.rotation(0, 0, 1, 0));
         }
 
-        
+
         if (this.control.d) {
             head_transform = Mat4.rotation(1/2*Math.PI, 0, 1, 0);
             body_transform = Mat4.rotation(1/2*Math.PI, 0, 1, 0).times(body_transform);
@@ -640,52 +644,103 @@ export class Control_Demo extends Simulation {
         /*this.clothing.dress.draw(
             context,
             program_state,
-            agent_trans2.times(
-                Mat4.translation(0,-2.5,-0.1)
-            ).times(
-                Mat4.rotation(-Math.PI/1.7, 0, 1, 0)
-            ).times(
-                Mat4.scale(1,1,1)
-            ),
+            agent_trans2.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)),
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );*/
 
         /*this.clothing.dress2.draw(
             context,
             program_state,
-            agent_trans2.times(
-                Mat4.translation(0,1.65,0)
-            ).times(
-                Mat4.rotation(Math.PI/2, 0, 1, 0)
-            ).times(
-                Mat4.scale(6,6,7.5)
-            ),
+            agent_trans2.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );*/
 
-        /*
 
+        /*
         this.clothing.shirt1.draw(
             context,
             program_state,
-            agent_trans2.times(
-                Mat4.translation(0,-1.7,0)
-            ).times(
-                Mat4.rotation(Math.PI/2, 0, 1, 0)
-            ).times(
-                Mat4.scale(1,1,1)
-            ),
+            agent_trans2.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(1,1,1)),
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );
         */
 
 
 
-        //let clothingList = [this.clothing.dress];
+        /*
+        this.clothing.shirt3.draw(
+            context,
+            program_state,
+            agent_trans2.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1)),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+        */
 
-        /*for (let x = -30; x <= 40; x += 30) {
+
+
+        this.clothing.shirt2.draw(
+            context,
+            program_state,
+            agent_trans2.times(Mat4.translation(0,-2.5,0)).times(Mat4.scale(1.2,1.2,3.6)).times(Mat4.rotation(0, 0, 1, 0)),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+
+
+
+        /*
+        this.clothing.shirt4.draw(
+            context,
+            program_state,
+            agent_trans2.times(
+                Mat4.translation(0,-2.2,-0.3)
+            ).times(
+                Mat4.scale(1.2,1.2,3.6)
+            ).times(
+                Mat4.rotation(-Math.PI/2, 0, 1, 0)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+`       */
+
+
+        /*
+        this.clothing.pant.draw(
+            context,
+            program_state,
+            agent_trans2.times(
+                Mat4.translation(0.3,-4,-0.2)
+            ).times(
+                Mat4.rotation(0, 0, 1, 0)
+            ).times(
+                Mat4.scale(0.4,0.6,0.8)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+
+        this.clothing.pant.draw(
+            context,
+            program_state,
+            agent_trans2.times(
+                Mat4.translation(-0.3,-4,-0.2)
+            ).times(
+                Mat4.rotation(0, 0, 1, 0)
+            ).times(
+                Mat4.scale(0.4,0.6,0.8)
+            ),
+            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+        );
+
+         */
+
+
+
+        let clothingList = [this.clothing.dress, this.clothing.dress2, this.clothing.dress2, this.clothing.shirt1, this.clothing.shirt2, this.clothing.shirt3];
+        let transformList = [agent_trans2.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)), agent_trans2.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),agent_trans2.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)), agent_trans2.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1)),  agent_trans2.times(Mat4.translation(0,-2.5,0)).times(Mat4.scale(1.2,1.2,3.6)).times(Mat4.rotation(1, 0, 1, 0)), agent_trans2.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
+
+        let i = 0;
+        for (let x = -80; x <= 80; x += 60) {
             // Loop over z coordinates
-            for (let z = -10; z <= 50; z += 25) {
+            for (let z = -30; z <= 50; z += 40) {
                 // Translate each stand to its position and draw it
                 let stand_location = Mat4.translation(x, -4, z);
                 this.stand.draw(
@@ -695,14 +750,17 @@ export class Control_Demo extends Simulation {
                     this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
                 );
                 //need a matrix of translations
-                clothingList[0].draw(
+                clothingList[i%6].draw(
                     context,
                     program_state,
-                    Mat4.translation(x, 2, z).times(transformationList[0]),
+                    Mat4.translation(x, 2, z).times(transformList[i%6]),
                     this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
                 );
+                i = i+1;
             }
-        }*/
+        }
+
+
 
         /*
         this.clothing.dress.draw(
