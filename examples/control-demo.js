@@ -431,10 +431,10 @@ export class Control_Demo extends Simulation {
             this.lengthen_hair = !this.lengthen_hair;
         }, '#6E6460');
 
-        this.key_triggered_button("Scarf", ["Shift", "a"], () => {
+        this.key_triggered_button("Scarf", ["Shift", "G"], () => {
             this.scarf_on = !this.scarf_on;
         }, '#6E6460');
-        this.key_triggered_button("Hat", ["Shift", "m"], () => {
+        this.key_triggered_button("Hat", ["Shift", "J"], () => {
             this.hat_on = !this.hat_on;
         }, '#6E6460');
 
@@ -589,7 +589,6 @@ export class Control_Demo extends Simulation {
         //program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
 
 
-
 // Define light parameters
         const light_position1 = vec4(0, -10, 50, 1); // Adjust position as needed (front light)
         const light_position2 = vec4(0, 3, -5, 1); // Adjust position as needed (middle left)
@@ -605,7 +604,6 @@ export class Control_Demo extends Simulation {
             program_state.set_camera(this.camera_main_scene);
             this.agent_pos = this.character_main_scene;
         }
-
 
 
 // Create the light object
@@ -645,11 +643,11 @@ export class Control_Demo extends Simulation {
 
 
         //K.S. light testing
-
+        if (this.atFashionLand) {
         let light_position = vec4(1000, 30, 5, 1);
-        let sunColor = color(1, .5 + .5*Math.sin((2*Math.PI*t)*20), .5 + .5*Math.sin((2*Math.PI*t)*20), 1.0);
-        program_state.lights = [new Light(light_position, sunColor, 10**(2+Math.sin(2*Math.PI*t)*20))];
-
+        let sunColor = color(1, .5 + .5 * Math.sin((2 * Math.PI * t) * 20), .5 + .5 * Math.sin((2 * Math.PI * t) * 20), 1.0);
+        program_state.lights = [new Light(light_position, sunColor, 10 ** (2 + Math.sin(2 * Math.PI * t) * 20))];
+    }
 
         //the world
         let world_matrix = Mat4.scale(200, 200, 200).times(Mat4.identity());
@@ -795,7 +793,7 @@ export class Control_Demo extends Simulation {
             this.hat.draw(
                 context,
                 program_state,
-                agent_trans.times(Mat4.translation(0,2,0)).times(
+                agent_trans.times(Mat4.translation(0,1.5,0)).times(
                     Mat4.scale(0.6,0.6,0.9)
                 ),
                 this.material.override({ambient: 0.5, texture: this.data.textures.hatTexture})
@@ -806,8 +804,8 @@ export class Control_Demo extends Simulation {
             this.scarf.draw(
                 context,
                 program_state,
-                agent_trans.times(Mat4.translation(0,2,0)).times(
-                    Mat4.scale(0.6,0.6,0.9)
+                agent_trans.times(Mat4.translation(0,-1,0)).times(
+                    Mat4.scale(0.7,0.7,0.7)
                 ),
                 this.material.override({ambient: 0.5, texture: this.data.textures.scarfTexture})
             );

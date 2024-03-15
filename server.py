@@ -1,6 +1,6 @@
 import sys
 
-PORT = 3333
+PORT = 8080
 
 if sys.version_info < (3, 0):
     import SimpleHTTPServer
