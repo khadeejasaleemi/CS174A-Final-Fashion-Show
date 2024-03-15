@@ -351,7 +351,8 @@ export class Control_Demo extends Simulation {
             () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
         this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
-
+        this.key_triggered_button("Go to Fashion Show", ["f"], function ()  {
+            this.atFashionLand ^= 1;});
     }
 
     willCollide(newPos) {
