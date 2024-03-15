@@ -261,6 +261,8 @@ export class Control_Demo extends Simulation {
         this.control.d = false;
         this.control.space = false;
 
+        this.atFashionLand = false;
+
         this.clothing = {
             shirt: new Shape_From_File("assets/shirt.obj"),
             dress: new Shape_From_File("assets/dress.obj"),
@@ -357,7 +359,8 @@ export class Control_Demo extends Simulation {
             () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
         this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
-
+        this.key_triggered_button("Go to Fashion Show", ["f"], function ()  {
+            this.atFashionLand ^= 1;});
     }
 
      willCollide(newPos) {
@@ -470,6 +473,8 @@ export class Control_Demo extends Simulation {
             this.world_material
         );
 
+        //Clothes Land
+
         //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
@@ -492,6 +497,43 @@ export class Control_Demo extends Simulation {
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
+ 
+        //Fashion Show Land:
+
+        world_matrix = Mat4.translation(600, 0 , 0).times(world_matrix);
+
+        this.shapes.world.draw(
+            context,
+            program_state,
+            world_matrix,
+            this.world_material
+        );
+
+        //The ground
+        //x = 600 represents the x position of the ground and back wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.worldNight}));
+
+        //right wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(700, 30, 0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.crowd}));
+
+        //left wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(500, 30 ,0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.crowd}));
+
+        //back wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, 30, -25)
+                .times(Mat4.rotation(Math.PI, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.fashionShow}));
+
+        //The top wall/sky
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.ground}));
 
         let agent_trans_s = Mat4.translation(0, -4, 0)
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
@@ -626,12 +668,20 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.translation(0, leg_rotation_factor, 0)).times(Mat4.rotation(Math.PI, 0, 1, 0));
         }
 
+        /*if (this.atFashionLand === 1) {
+            this.agent_pos[0] = 600;
+            this.agent_pos[1] = 4;
+            this.agent_pos[2] = 0;
+            program_state.set_camera(Mat4.translation(-600, -2.80, -82.10));    // Locate the camera here (inverted matrix).
+        }*/
+
         this.body.draw(
             context,
             program_state,
             agent_trans.times(body_transform),
             this.material.override({ambient:.8, texture: this.data.textures.skin}),
         );
+
 
 
 
@@ -663,6 +713,7 @@ export class Control_Demo extends Simulation {
         this.smile.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
+        
 
         //end of walking implementation
         /*
