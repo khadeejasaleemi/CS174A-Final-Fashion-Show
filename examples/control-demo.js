@@ -317,10 +317,10 @@ export class Control_Demo extends Simulation {
 
         // Define bounding boxes for walls and the head
         // (collisions against walls were found with some trial and error by adjusting coords)
-        this.wallLeft = new BoundingBox(vec3(-50, -10, -25), vec3(-44.2, 30, 50));  // Adjusted to be slightly inward
-        this.wallRight = new BoundingBox(vec3(44.2, -10, -25), vec3(50, 30, 30));   // Adjusted to be slightly inward
-        this.wallBack = new BoundingBox(vec3(-49.5, -10, -18), vec3(49.5, 30, -18));
-        this.wallFront = new BoundingBox(vec3(-50, -10, 45), vec3(50, 30, 47));
+        this.wallLeft = new BoundingBox(vec3(-97, -10, -50), vec3(-96, 70, 100));  // Adjusted to be slightly inward
+        this.wallRight = new BoundingBox(vec3(96, -10, -50), vec3(97, 68, 100));   // Adjusted to be slightly inward
+        this.wallBack = new BoundingBox(vec3(-100, -10, -25), vec3(100, 70, -24));
+        this.wallFront = new BoundingBox(vec3(-100, -10, 100), vec3(100, 50, 101));
         this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
 
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
@@ -613,7 +613,7 @@ export class Control_Demo extends Simulation {
         );
 
 
-        /*
+
                 this.leg.draw(
                     context,
                     program_state,
@@ -628,7 +628,6 @@ export class Control_Demo extends Simulation {
                     this.material.override({ambient:.8, texture: this.data.textures.skin}),
                 );
 
-         */
 
         let agent_trans2 = agent_trans.times(head_transform);
 
@@ -711,7 +710,7 @@ export class Control_Demo extends Simulation {
 `       */
 
 
-        /*
+
         this.clothing.pant.draw(
             context,
             program_state,
@@ -738,17 +737,17 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );
 
-         */
 
 
 
-        /*let clothingList = [this.clothing.dress, this.clothing.dress2, this.clothing.dress2, this.clothing.shirt1, this.clothing.shirt2, this.clothing.shirt3];
+
+        let clothingList = [this.clothing.dress, this.clothing.dress2, this.clothing.dress2, this.clothing.shirt1, this.clothing.shirt2, this.clothing.shirt3];
         let transformList = [agent_trans_s.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)), agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)), agent_trans_s.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1)),  agent_trans_s.times(Mat4.translation(0,-2.5,0)).times(Mat4.scale(1.2,1.2,3.6)).times(Mat4.rotation(1, 0, 1, 0)), agent_trans_s.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
         let textureList = [this.data.textures.dress1Texture, this.data.textures.dress2Texture,this.data.textures.dress2Texture,this.data.textures.shirt1Texture,this.data.textures.shirt2Texture,this.data.textures.shirt2Texture];
         let i = 0;
         for (let x = -60; x <= 120; x += 60) {
             // Loop over z coordinates
-            for (let z = -90; z <= 30; z += 40) {
+            for (let z = 10; z <= 60; z += 50) {
                 // Translate each stand to its position and draw it
                 let stand_location = Mat4.translation(x, -4, z);
                 this.stand.draw(
@@ -766,7 +765,7 @@ export class Control_Demo extends Simulation {
                 );
                 i = i+1;
             }
-        }*/
+        }
 
         /*
         this.clothing.dress.draw(
@@ -774,9 +773,9 @@ export class Control_Demo extends Simulation {
             program_state,
             Mat4.translation(x, -3, z).times(Mat4.scale(5, 5, 5)),
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}),
-        );
+        ); */
 
-         */
+
 
         //this.stand.draw(context, program_state, Mat4.translation(-4,-4,0).times(Mat4.scale(4,4,4)),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
         //this.stand.draw(context, program_state,Mat4.translation(4,-4.4,0),  this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture}));
