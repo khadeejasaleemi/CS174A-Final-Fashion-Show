@@ -323,6 +323,15 @@ export class Control_Demo extends Simulation {
         this.wallFront = new BoundingBox(vec3(-100, -10, 100), vec3(100, 50, 101));
         this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
 
+        this.clothingBoundingBoxes = [
+            new BoundingBox(vec3(-65, -5, 5), vec3(-35, 15, 65)),  // Dress 1
+            new BoundingBox(vec3(-5, -5, 5), vec3(25, 15, 65)),    // Dress 2
+            new BoundingBox(vec3(55, -5, 5), vec3(85, 15, 65)),    // Dress 3
+            new BoundingBox(vec3(-65, -5, 75), vec3(-35, 15, 135)),// Shirt 1
+            new BoundingBox(vec3(-5, -5, 75), vec3(25, 15, 135)),  // Shirt 2
+            new BoundingBox(vec3(55, -5, 75), vec3(85, 15, 135))   // Shirt 3
+        ];
+
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
         // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
@@ -351,7 +360,7 @@ export class Control_Demo extends Simulation {
 
     }
 
-    willCollide(newPos) {
+     willCollide(newPos) {
         let newHeadMainBox = new BoundingBox(
             vec3(newPos[0] + this.headMainBox.min[0], newPos[1] + this.headMainBox.min[1], newPos[2] + this.headMainBox.min[2]),
             vec3(newPos[0] + this.headMainBox.max[0], newPos[1] + this.headMainBox.max[1], newPos[2] + this.headMainBox.max[2])
@@ -365,7 +374,7 @@ export class Control_Demo extends Simulation {
             vec3(newPos[0] + this.headEarRightBox.max[0], newPos[1] + this.headEarRightBox.max[1], newPos[2] + this.headEarRightBox.max[2])
         );
 
-        return this.wallLeft.intersects(newHeadMainBox) ||
+        if (this.wallLeft.intersects(newHeadMainBox) ||
             this.wallRight.intersects(newHeadMainBox) ||
             this.wallBack.intersects(newHeadMainBox) ||
             this.wallFront.intersects(newHeadMainBox) ||
@@ -374,8 +383,20 @@ export class Control_Demo extends Simulation {
             this.wallBack.intersects(newHeadEarLeftBox) ||
             this.wallLeft.intersects(newHeadEarRightBox) ||
             this.wallRight.intersects(newHeadEarRightBox) ||
-            this.wallBack.intersects(newHeadEarRightBox);
+            this.wallBack.intersects(newHeadEarRightBox)) {
+            return true;
+        }
+
+        // Check collisions with clothing articles
+        for (let bbox of this.clothingBoundingBoxes) {
+            if (bbox.intersects(newHeadMainBox)) {
+                return true;
+            }
+        }
+
+        return false;
     }
+    
     update_state(dt) {
         // update_state():  Override the base time-stepping code to say what this particular
         // scene should do to its bodies every frame -- including applying forces.
