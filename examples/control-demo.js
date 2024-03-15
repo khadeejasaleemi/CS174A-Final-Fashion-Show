@@ -453,6 +453,8 @@ export class Control_Demo extends Simulation {
             this.world_material
         );
 
+        //Clothes Land
+
         //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
@@ -475,6 +477,43 @@ export class Control_Demo extends Simulation {
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
+
+        //Fashion Show Land:
+
+        world_matrix = Mat4.translation(600, 0 , 0).times(world_matrix);
+
+        this.shapes.world.draw(
+            context,
+            program_state,
+            world_matrix,
+            this.world_material
+        );
+
+        //The ground
+        //x = 600 represents the x position of the ground and back wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.worldNight}));
+
+        //right wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(700, 30, 0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.crowd}));
+
+        //left wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(500, 30 ,0)
+                .times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.crowd}));
+
+        //back wall
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, 30, -25)
+                .times(Mat4.rotation(Math.PI, 0, 1, 0)).times(Mat4.scale(100, 40, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.fashionShow}));
+
+        //The top wall/sky
+        this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
+            this.material.override({ambient:.8, texture: this.data.textures.ground}));
 
 
         let agent_trans = Mat4.translation(this.agent_pos[0], this.agent_pos[1], this.agent_pos[2])
