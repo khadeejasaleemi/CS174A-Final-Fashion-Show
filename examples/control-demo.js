@@ -644,14 +644,19 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.translation(0, leg_rotation_factor, 0)).times(Mat4.rotation(Math.PI, 0, 1, 0));
         }
 
+        /*if (this.atFashionLand === 1) {
+            this.agent_pos[0] = 600;
+            this.agent_pos[1] = 4;
+            this.agent_pos[2] = 0;
+            program_state.set_camera(Mat4.translation(-600, -2.80, -82.10));    // Locate the camera here (inverted matrix).
+        }*/
+
         this.body.draw(
             context,
             program_state,
             agent_trans.times(body_transform),
             this.material.override({ambient:.8, texture: this.data.textures.skin}),
         );
-
-
 
         this.leg.draw(
             context,
@@ -681,7 +686,6 @@ export class Control_Demo extends Simulation {
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
         //end of walking implementation
-
 
         /*this.clothing.dress.draw(
             context,
