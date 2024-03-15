@@ -734,6 +734,7 @@ export class Control_Demo extends Simulation {
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
         // Set desired color
+        /*
         let cabinet_color = color(0.3, 0.1, 0, 1); // Brown color
         this.cabinet.draw(
             context,
@@ -762,6 +763,8 @@ export class Control_Demo extends Simulation {
             Mat4.identity,
             this.material.override({ ambient: 0.4, color: scarf_color})
         );
+
+         */
 
         //end of walking implementation
         /*
@@ -807,7 +810,7 @@ export class Control_Demo extends Simulation {
         this.clothing.shirt2.draw(
             context,
             program_state,
-            agent_trans2.times(Mat4.translation(0,-2.5,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.2,1.2)),
+            agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
             this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
         );
 
@@ -834,12 +837,8 @@ export class Control_Demo extends Simulation {
         this.clothing.pant.draw(
             context,
             program_state,
-            agent_trans2.times(
-                Mat4.translation(0.3,-4,-0.2)
-            ).times(
-                Mat4.rotation(0, 0, 1, 0)
-            ).times(
-                Mat4.scale(0.4,0.6,0.8)
+            agent_trans.times(leg1_transform).times(
+                Mat4.scale(0.6,0.6,0.9)
             ),
             this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
         );
@@ -847,14 +846,10 @@ export class Control_Demo extends Simulation {
         this.clothing.pant.draw(
             context,
             program_state,
-            agent_trans2.times(
-                Mat4.translation(-0.3,-4,-0.2)
-            ).times(
-                Mat4.rotation(0, 0, 1, 0)
-            ).times(
-                Mat4.scale(0.4,0.6,0.8)
+            agent_trans.times(leg2_transform).times(
+                Mat4.scale(0.6,0.6,0.9)
             ),
-            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+            this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
         );
 
 
@@ -866,7 +861,7 @@ export class Control_Demo extends Simulation {
             agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
             agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
             agent_trans_s.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)),
-            agent_trans_s.times(Mat4.translation(0,-2.5,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.2,1.2)),
+            agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
             agent_trans_s.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
         let textureList = [this.data.textures.dress1Texture, this.data.textures.dress2Texture,this.data.textures.dress3Texture,this.data.textures.shirt1Texture,this.data.textures.shirt2Texture,this.data.textures.shirt3Texture];
         let pantTextureList = [this.data.textures.pant1Texture, this.data.textures.pant2Texture, this.data.textures.pant2Texture];
@@ -921,6 +916,7 @@ export class Control_Demo extends Simulation {
                 i = i+1;
             }
         }
+
 
         /*
         this.clothing.dress.draw(
