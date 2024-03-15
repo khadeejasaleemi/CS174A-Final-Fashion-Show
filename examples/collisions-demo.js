@@ -171,9 +171,14 @@ export class Test_Data {
             ground: new Texture("assets/ground.png"),
             ground2: new Texture("assets/ground2.png"),
             skin: new Texture("assets/skin.png"),
-            dressTexture: new Texture("assets/dress_texture.png"),
-            shirtTexture: new Texture("assets/shirt_texture.png"),
-
+            dress1Texture: new Texture("assets/dress1.png"),
+            dress2Texture: new Texture("assets/dress2.png"),
+            dress3Texture: new Texture("assets/dress4.png"),
+            shirt1Texture: new Texture("assets/shirt1.png"),
+            shirt2Texture: new Texture("assets/shirt2.png"),
+            shirt3Texture: new Texture("assets/shirt3.png"),
+            pant1Texture: new Texture("assets/pant1.png"),
+            pant2Texture: new Texture("assets/pant2.png"),
         }
         this.shapes = {
             donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),
