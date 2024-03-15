@@ -184,6 +184,8 @@ export class Test_Data {
             shirt3Texture: new Texture("assets/shirt3.png"),
             pant1Texture: new Texture("assets/pant1.png"),
             pant2Texture: new Texture("assets/pant2.png"),
+            hatTexture: new Texture("assets/hat.png"),
+            scarfTexture: new Texture("assets/scarf.png"),
 
 
         }
