@@ -361,7 +361,8 @@ export class Control_Demo extends Simulation {
             new BoundingBox(vec3(52, -10, 56), vec3(68, 20, 65))     // Shirt 3
         ];
 
-
+        this.scarf_on = false;
+        this.hat_on = false;
         this.dress1Box = new BoundingBox(vec3(-68, -10, 6), vec3(-50, 20, 15))   // Dress 1
 
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
@@ -428,6 +429,13 @@ export class Control_Demo extends Simulation {
         });
         this.key_triggered_button("Change Hair Length", ["Shift", "h"], () => {
             this.lengthen_hair = !this.lengthen_hair;
+        }, '#6E6460');
+
+        this.key_triggered_button("Scarf", ["Shift", "a"], () => {
+            this.scarf_on = !this.scarf_on;
+        }, '#6E6460');
+        this.key_triggered_button("Hat", ["Shift", "m"], () => {
+            this.hat_on = !this.hat_on;
         }, '#6E6460');
 
         // this.key_triggered_button("Camera Flashes", ["y"], () => {
@@ -772,6 +780,29 @@ export class Control_Demo extends Simulation {
             left_white_eye_transform, // Scale the eye
             this.material.override({ ambient: 0.4, color: white }) // Use maximum ambient and specified eye color
         );
+
+        if(this.hat_on){
+            this.hat.draw(
+                context,
+                program_state,
+                agent_trans.times(Mat4.translation(0,2,0)).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.hatTexture})
+            );
+        }
+
+        if(this.scarf_on){
+            this.scarf.draw(
+                context,
+                program_state,
+                agent_trans.times(Mat4.translation(0,2,0)).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.scarfTexture})
+            );
+        }
+
 
         //walking implementation
         let head_transform = Mat4.identity();
