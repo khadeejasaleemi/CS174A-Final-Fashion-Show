@@ -486,6 +486,8 @@ export class Control_Demo extends Simulation {
 
         //Clothes Land
 
+
+
         //the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
@@ -733,17 +735,34 @@ export class Control_Demo extends Simulation {
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
         // Set desired color
-        let cabinet_color = "#964B00"; // Brown color
+        let cabinet_color = color(0.3, 0.1, 0, 1); // Brown color
         this.cabinet.draw(
             context,
             program_state,
             Mat4.identity,
             this.material.override({ ambient: 0.4, color: cabinet_color})
         );
-
-
-
-
+        let hat_color = color(0, 0, 0, 1);
+        let bracelet_color = color(0.3, 0.1, 1, 1);
+        let scarf_color = color(0.3, 0, 0.3, 1);
+        this.hat.draw(
+            context,
+            program_state,
+            Mat4.identity,
+            this.material.override({ ambient: 0.4, color: hat_color})
+        );
+        this.bracelet.draw(
+            context,
+            program_state,
+            Mat4.identity,
+            this.material.override({ ambient: 0.4, color: bracelet_color})
+        );
+        this.scarf.draw(
+            context,
+            program_state,
+            Mat4.identity,
+            this.material.override({ ambient: 0.4, color: scarf_color})
+        );
 
         //end of walking implementation
         /*
