@@ -588,6 +588,8 @@ export class Control_Demo extends Simulation {
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
         //program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
 
+
+
 // Define light parameters
         const light_position1 = vec4(0, -10, 50, 1); // Adjust position as needed (front light)
         const light_position2 = vec4(0, 3, -5, 1); // Adjust position as needed (middle left)
@@ -640,6 +642,14 @@ export class Control_Demo extends Simulation {
         //     const flash_position = vec4(600, i, 0, 1);
         //     program_state.lights.push(new Light(flash_position, flash_color, flash_intensity));
         // }
+
+
+        //K.S. light testing
+
+        let light_position = vec4(1000, 30, 5, 1);
+        let sunColor = color(1, .5 + .5*Math.sin((2*Math.PI*t)*20), .5 + .5*Math.sin((2*Math.PI*t)*20), 1.0);
+        program_state.lights = [new Light(light_position, sunColor, 10**(2+Math.sin(2*Math.PI*t)*20))];
+
 
         //the world
         let world_matrix = Mat4.scale(200, 200, 200).times(Mat4.identity());
