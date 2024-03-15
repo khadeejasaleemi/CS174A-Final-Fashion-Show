@@ -261,6 +261,8 @@ export class Control_Demo extends Simulation {
         this.control.d = false;
         this.control.space = false;
 
+        this.atFashionLand = false;
+
         this.clothing = {
             shirt: new Shape_From_File("assets/shirt.obj"),
             dress: new Shape_From_File("assets/dress.obj"),
