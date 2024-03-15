@@ -721,7 +721,7 @@ export class Control_Demo extends Simulation {
             ).times(
                 Mat4.scale(0.4,0.6,0.8)
             ),
-            this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
+            this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
         );
 
         this.clothing.pant.draw(
@@ -742,8 +742,14 @@ export class Control_Demo extends Simulation {
 
 
         let clothingList = [this.clothing.dress, this.clothing.dress2, this.clothing.dress2, this.clothing.shirt1, this.clothing.shirt2, this.clothing.shirt3];
-        let transformList = [agent_trans_s.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)), agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)), agent_trans_s.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1)),  agent_trans_s.times(Mat4.translation(0,-2.5,0)).times(Mat4.scale(1.2,1.2,3.6)).times(Mat4.rotation(1, 0, 1, 0)), agent_trans_s.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
-        let textureList = [this.data.textures.dress1Texture, this.data.textures.dress2Texture,this.data.textures.dress2Texture,this.data.textures.shirt1Texture,this.data.textures.shirt2Texture,this.data.textures.shirt2Texture];
+        let transformList = [agent_trans_s.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)),
+            agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
+            agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
+            agent_trans_s.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)),
+            agent_trans_s.times(Mat4.translation(0,-2.5,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.2,1.2)),
+            agent_trans_s.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
+        let textureList = [this.data.textures.dress1Texture, this.data.textures.dress2Texture,this.data.textures.dress3Texture,this.data.textures.shirt1Texture,this.data.textures.shirt2Texture,this.data.textures.shirt3Texture];
+        let pantTextureList = [this.data.textures.pant1Texture, this.data.textures.pant2Texture, this.data.textures.pant2Texture];
         let i = 0;
         for (let x = -60; x <= 120; x += 60) {
             // Loop over z coordinates
@@ -763,6 +769,35 @@ export class Control_Demo extends Simulation {
                     Mat4.translation(x, 2, z).times(transformList[i%6]),
                     this.material.override({ambient: 0.5, texture: textureList[i%6]}),
                 );
+
+                if(i === 3 || i===4 || i === 5){
+                    this.clothing.pant.draw(
+                        context,
+                        program_state,
+                        Mat4.translation(x, 1, z).times(agent_trans_s).times(
+                            Mat4.translation(0.3,-4,-0.2)
+                        ).times(
+                            Mat4.rotation(0, 0, 1, 0)
+                        ).times(
+                            Mat4.scale(0.4,0.6,0.8)
+                        ),
+                        this.material.override({ambient: 0.5, texture: pantTextureList[0]})
+                    );
+
+
+                    this.clothing.pant.draw(
+                        context,
+                        program_state,
+                        Mat4.translation(x, 1, z).times(agent_trans_s).times(
+                            Mat4.translation(-0.3,-4,-0.2)
+                        ).times(
+                            Mat4.rotation(0, 0, 1, 0)
+                        ).times(
+                            Mat4.scale(0.4,0.6,0.8)
+                        ),
+                        this.material.override({ambient: 0.5, texture: pantTextureList[0]})
+                    );
+                }
                 i = i+1;
             }
         }
