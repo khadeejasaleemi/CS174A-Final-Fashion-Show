@@ -177,7 +177,7 @@ export class Test_Data {
             fashionShow: new Texture("assets/fashionshow.png"),
             dress1Texture: new Texture("assets/dress1.png"),
             dress2Texture: new Texture("assets/dress2.png"),
-            dress3Texture: new Texture("assets/dress4.png"),
+            dress3Texture: new Texture("assets/dress3.png"),
             shirt1Texture: new Texture("assets/shirt1.png"),
             shirt2Texture: new Texture("assets/shirt2.png"),
             shirt3Texture: new Texture("assets/shirt3.png"),
