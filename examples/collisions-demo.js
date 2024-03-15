@@ -164,6 +164,7 @@ export class Test_Data {
             rgb: new Texture("assets/rgb.jpg"),
             earth: new Texture("assets/earth.gif"),
             grid: new Texture("assets/grid.png"),
+            redcarpet: new Texture("assets/redcarpet.png"),
             sky: new Texture("assets/sky.png"),
             stars: new Texture("assets/stars.png"),
             text: new Texture("assets/text.png"),

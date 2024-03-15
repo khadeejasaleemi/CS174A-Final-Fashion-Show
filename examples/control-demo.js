@@ -214,6 +214,8 @@ export class Simulation extends Scene {
     {
         throw "Override this"
     }
+
+    // Function to toggle between scenes
 }
 
 export class Control_Demo extends Simulation {
@@ -262,7 +264,18 @@ export class Control_Demo extends Simulation {
         this.control.d = false;
         this.control.space = false;
 
-        this.atFashionLand = false;
+        // Add separate camera positions for each scene
+        this.camera_main_scene = Mat4.translation(-3.15, -2.80, -82.10);
+        this.camera_fashion_land = Mat4.translation(-600, -2.80, -82.10);
+
+        // Add separate character positions for each scene
+        this.character_main_scene = vec3(0, -4, 0);
+        this.character_fashion_land = vec3(600, -4, 0);
+
+        // Camera flashes:
+        this.camera_flashes_active = false;
+        this.flash_start_time = 0;
+        this.flash_duration = 1000; // Duration of the flashes in milliseconds
 
         this.dress1 = false;
         this.dress2 = false;
@@ -362,6 +375,29 @@ export class Control_Demo extends Simulation {
         return this.material.override(color(.6, .6 * Math.random(), .6 * Math.random(), 1));
     }
 
+    create_camera_flashes(program_state) {
+        const flash_duration = 1000; // Duration of the flashes in milliseconds
+        const intensity = 100000; // Intensity of the flash lights
+
+        // Check if the flashes are active and if they are within the duration
+        if (this.camera_flashes_active && program_state.animation_time - this.flash_start_time < flash_duration) {
+            // Define positions for the flash lights around the scene
+            const flash_positions = [
+                vec4(600, 10, 30, 1),
+                vec4(580, 10, 40, 1),
+                vec4(620, 10, 40, 1),
+                // Add more positions as needed
+            ];
+
+            // Create a light source for each position
+            flash_positions.forEach(position => {
+                program_state.lights.push(new Light(position, color(1, 1, 1, 1), intensity));
+            });
+        } else {
+            this.camera_flashes_active = false; // Deactivate the flashes after the duration
+        }
+    }
+
     make_control_panel() {
         super.make_control_panel();
         this.new_line();
@@ -377,12 +413,29 @@ export class Control_Demo extends Simulation {
             () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
         this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
-        this.key_triggered_button("Move to Fashion Show Land", ["f"], function() {
+        // "t" for teleport to fashion land
+        this.key_triggered_button("Move to Fashion Show Land", ["t"], function() {
             this.atFashionLand = !this.atFashionLand;
+            if (this.atFashionLand) {
+                // Update the camera and character position for Fashion Show Land
+                program_state.set_camera(this.camera_fashion_land);
+                this.agent_pos = this.character_fashion_land;
+            } else {
+                // Update the camera and character position for the main scene
+                program_state.set_camera(this.camera_main_scene);
+                this.agent_pos = this.character_main_scene;
+            }
         });
         this.key_triggered_button("Change Hair Length", ["Shift", "h"], () => {
             this.lengthen_hair = !this.lengthen_hair;
         }, '#6E6460');
+
+        // this.key_triggered_button("Camera Flashes", ["y"], () => {
+        //     this.camera_flashes_active = !this.camera_flashes_active;
+        //     if (this.camera_flashes_active) {
+        //         this.flash_start_time = program_state.animation_time; // Record the start time of the flashes
+        //     }
+        // }, '#6E6460');
 
     }
 
@@ -522,6 +575,7 @@ export class Control_Demo extends Simulation {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             this.children.push(new defs.Program_State_Viewer());
             program_state.set_camera(Mat4.translation(-3.15, -2.80, -82.10));    // Locate the camera here (inverted matrix).
+
         }
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
         //program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
@@ -532,16 +586,52 @@ export class Control_Demo extends Simulation {
         const light_color = color(1, 1, 1, 1); // Adjust color as needed
         const light_intensity = 1000000; // Adjust intensity as needed
 
-// Create the light object
+        if (this.atFashionLand) {
+            program_state.set_camera(this.camera_fashion_land);
+            this.agent_pos = this.character_fashion_land;
 
+
+        } else {
+            program_state.set_camera(this.camera_main_scene);
+            this.agent_pos = this.character_main_scene;
+        }
+
+
+
+// Create the light object
+        let light_position3 = vec4(602, 1, 1, 1);
         const light1 = new Light(light_position1, light_color, light_intensity);
         const light2 = new Light(light_position2, light_color, light_intensity);
+        const light3 = new Light(light_position3, light_color, 250000000);
 
 // Set the light for the program state
-        program_state.lights = [light1, light2];
+        program_state.lights = [light1, light2, light3];
 
         //the time
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+
+        // Create the camera flashes
+        const flash_intensity = 1000000; // Increased intensity
+        const flash_color = color(1, 1, 1, 1); // White color for the flash
+
+
+        // Define the period and duration of each flash
+        const flash_period = 2000; // 2 seconds for each cycle (flash + pause)
+        const flash_duration = 200; // Increased duration to 200 milliseconds
+
+        // // Calculate the current time within the cycle
+        // const time_in_cycle = program_state.animation_time % flash_period;
+        // for (let i = 0; i < 20; i++) { // number of flashes
+        //     const flash_position = vec4(Math.random() * 1200 - 600, Math.random() * 40 - 20, Math.random() * 200 - 100, 1);
+        //     program_state.lights.push(new Light(flash_position, flash_color, flash_intensity));
+        // }
+        //
+        // // Add flashes at different positions around the scene
+        // for (let i = 0; i < 3; i++) { // number of flashes
+        //     // const flash_position = vec4(Math.random() * 1200 - 600, Math.random() * 40 - 20, Math.random() * 200 - 100, 1);
+        //     const flash_position = vec4(600, i, 0, 1);
+        //     program_state.lights.push(new Light(flash_position, flash_color, flash_intensity));
+        // }
 
         //the world
         let world_matrix = Mat4.scale(200, 200, 200).times(Mat4.identity());
@@ -580,7 +670,7 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.sky}));
  
-        //Fashion Show Land:
+        // Fashion Show Land:
 
         world_matrix = Mat4.translation(600, 0 , 0).times(world_matrix);
 
@@ -595,7 +685,7 @@ export class Control_Demo extends Simulation {
         //x = 600 represents the x position of the ground and back wall
         this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
-            this.material.override({ambient:.8, texture: this.data.textures.worldNight}));
+            this.material.override({ambient:.8, texture: this.data.textures.redcarpet}));
 
         //right wall
         this.shapes.square.draw(context, program_state, Mat4.translation(700, 30, 0)
@@ -616,17 +706,6 @@ export class Control_Demo extends Simulation {
         this.shapes.square.draw(context, program_state, Mat4.translation(600, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.ground}));
-
-        //added movement to fashion land right before any agent translations
-        if (this.atFashionLand) {
-            this.agent_pos = vec3(600, 4, 0);
-            program_state.set_camera(Mat4.translation(-600, -2.80, -82.10));    // Locate the camera here (inverted matrix).
-        }
-
-        else if(!this.atFashionLand){
-            this.agent_pos = vec3(0, -4, 0);
-            program_state.set_camera(Mat4.translation(-3.15, -2.80, -82.10));
-        }
 
         let agent_trans_s = Mat4.translation(0, -4, 0)
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
@@ -979,17 +1058,12 @@ export class Control_Demo extends Simulation {
 
          */
 
-
-
         /*this.clothing.shirt1.draw(
             context,
             program_state,
             agent_trans2.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)),
             this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
         );*/
-
-
-
 
         /*this.clothing.shirt3.draw(
             context,
@@ -998,16 +1072,12 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
         );*/
 
-
         // this.clothing.shirt2.draw(
         //     context,
         //     program_state,
         //     agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
         //     this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
         // );
-
-
-
 
         /*
         this.clothing.shirt4.draw(
@@ -1023,8 +1093,6 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient: 0.5, texture: this.data.textures.dressTexture})
         );
 `       */
-
-
 
         // this.clothing.pant.draw(
         //     context,
@@ -1043,10 +1111,6 @@ export class Control_Demo extends Simulation {
         //     ),
         //     this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
         // );
-
-
-
-
 
         let clothingList = [this.clothing.dress, this.clothing.dress2, this.clothing.dress2, this.clothing.shirt1, this.clothing.shirt2, this.clothing.shirt3];
         let transformList = [agent_trans_s.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)),
@@ -1169,6 +1233,10 @@ export class Control_Demo extends Simulation {
 
     }
 
+    toggleScene() {
+        this.atFashionLand = !this.atFashionLand;
+        this.currentPos = this.atFashionLand ? this.fashionShowPos : this.mainScenePos;
+    }
     // show_explanation(document_element) {
     //     document_element.innerHTML += `<p>This demo lets random initial momentums carry bodies until they fall and bounce.  It shows a good way to do incremental movements, which are crucial for making objects look like they're moving on their own instead of following a pre-determined path.  Animated objects look more real when they have inertia and obey physical laws, instead of being driven by simple sinusoids or periodic functions.
     //                                  </p><p>For each moving object, we need to store a model matrix somewhere that is permanent (such as inside of our class) so we can keep consulting it every frame.  As an example, for a bowling simulation, the ball and each pin would go into an array (including 11 total matrices).  We give the model transform matrix a \"velocity\" and track it over time, which is split up into linear and angular components.  Here the angular velocity is expressed as an Euler angle-axis pair so that we can scale the angular speed how we want it.
