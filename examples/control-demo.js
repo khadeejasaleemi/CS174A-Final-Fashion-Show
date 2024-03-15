@@ -263,6 +263,13 @@ export class Control_Demo extends Simulation {
 
         this.atFashionLand = false;
 
+        this.dress1 = false;
+        this.dress2 = false;
+        this.dress3 = false;
+        this.dress4 = false;
+        this.dress5 = false;
+        this.dress6 = false;
+
         this.clothing = {
             shirt: new Shape_From_File("assets/shirt.obj"),
             dress: new Shape_From_File("assets/dress.obj"),
@@ -339,6 +346,10 @@ export class Control_Demo extends Simulation {
             new BoundingBox(vec3(-8, -10, 56), vec3(8, 20, 65)),     // Shirt 2
             new BoundingBox(vec3(52, -10, 56), vec3(68, 20, 65))     // Shirt 3
         ];
+
+
+        this.dress1Box = new BoundingBox(vec3(-68, -10, 6), vec3(-50, 20, 15))   // Dress 1
+
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
         // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
@@ -400,12 +411,69 @@ export class Control_Demo extends Simulation {
             return true;
         }
 
-        // Check collisions with clothing articles
+         if ( (this.clothingBoundingBoxes[0].intersects(newHeadMainBox))) {
+             this.dress1 = true;
+             this.dress2 = false;
+             this.dress3 = false;
+             this.dress4 = false;
+             this.dress5 = false;
+             this.dress6 = false;
+
+         }
+
+         if ((this.clothingBoundingBoxes[1].intersects(newHeadMainBox))) {
+             this.dress1 = false;
+             this.dress2 = true;
+             this.dress3 = false;
+             this.dress4 = false;
+             this.dress5 = false;
+             this.dress6 = false;
+         }
+
+         if ( (this.clothingBoundingBoxes[2].intersects(newHeadMainBox))) {
+             this.dress1 = false;
+             this.dress2 = false;
+             this.dress3 = true;
+             this.dress4 = false;
+             this.dress5 = false;
+             this.dress6 = false;
+         }
+
+         if ((this.clothingBoundingBoxes[3].intersects(newHeadMainBox))) {
+             this.dress1 = false;
+             this.dress2 = false;
+             this.dress3 = false;
+             this.dress4 = true;
+             this.dress5 = false;
+             this.dress6 = false;
+         }
+
+         if ( (this.clothingBoundingBoxes[4].intersects(newHeadMainBox))) {
+             this.dress1 = false;
+             this.dress2 = false;
+             this.dress3 = false;
+             this.dress4 = false;
+             this.dress5 = true;
+             this.dress6 = false;
+         }
+
+         if ((this.clothingBoundingBoxes[5].intersects(newHeadMainBox))) {
+             this.dress1 = false;
+             this.dress2 = false;
+             this.dress3 = false;
+             this.dress4 = false;
+             this.dress5 = false;
+             this.dress6 = true;
+         }
+
+
+         // Check collisions with clothing articles
         for (let bbox of this.clothingBoundingBoxes) {
             if (bbox.intersects(newHeadMainBox)) {
                 return true;
             }
         }
+
 
         return false;
     }
@@ -733,6 +801,122 @@ export class Control_Demo extends Simulation {
         this.smile.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
+        if (this.dress1) {
+            this.clothing.dress.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,-2.5,-0.1)).times(Mat4.rotation(-Math.PI/1.7, 0, 1, 0)).times(Mat4.scale(1,1,1)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.dress1Texture})
+            );
+        } else if (this.dress2) {
+            this.clothing.dress2.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.dress3Texture})
+            );
+        } else if (this.dress3) {
+            this.clothing.shirt2.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,-2.5,0)).times(Mat4.scale(1.2,1.2,1.2)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.shirt2Texture})
+            );
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg1_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant2Texture})
+            );
+
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg2_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant2Texture})
+            );
+        } else if (this.dress4) {
+            this.clothing.dress2.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.dress2Texture})
+            );
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg1_transform).times(
+                    Mat4.translation(0.3,-4,-0.2)
+                ).times(
+                    Mat4.scale(0.2,0.6,0.8)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+            );
+
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg2_transform).times(
+                    Mat4.translation(-0.3,-4,-0.2)
+                ).times(
+                    Mat4.scale(0.2,0.6,0.8)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+            );
+        } else if (this.dress5) {
+            this.clothing.shirt1.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
+            );
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg1_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+            );
+
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg2_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+            );
+        } else if (this.dress6) {
+            this.clothing.shirt3.draw(
+                context,
+                program_state,
+                agent_trans2.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1)),
+                this.material.override({ambient: 0.5, texture: this.data.textures.shirt3Texture})
+            );
+
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg1_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant2Texture})
+            );
+
+            this.clothing.pant.draw(
+                context,
+                program_state,
+                agent_trans.times(leg2_transform).times(
+                    Mat4.scale(0.6,0.6,0.9)
+                ),
+                this.material.override({ambient: 0.5, texture: this.data.textures.pant2Texture})
+            );
+        }
         // Set desired color
         /*
         let cabinet_color = color(0.3, 0.1, 0, 1); // Brown color
@@ -807,12 +991,12 @@ export class Control_Demo extends Simulation {
         );*/
 
 
-        this.clothing.shirt2.draw(
-            context,
-            program_state,
-            agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
-            this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
-        );
+        // this.clothing.shirt2.draw(
+        //     context,
+        //     program_state,
+        //     agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
+        //     this.material.override({ambient: 0.5, texture: this.data.textures.shirt1Texture})
+        // );
 
 
 
@@ -834,23 +1018,23 @@ export class Control_Demo extends Simulation {
 
 
 
-        this.clothing.pant.draw(
-            context,
-            program_state,
-            agent_trans.times(leg1_transform).times(
-                Mat4.scale(0.6,0.6,0.9)
-            ),
-            this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
-        );
-
-        this.clothing.pant.draw(
-            context,
-            program_state,
-            agent_trans.times(leg2_transform).times(
-                Mat4.scale(0.6,0.6,0.9)
-            ),
-            this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
-        );
+        // this.clothing.pant.draw(
+        //     context,
+        //     program_state,
+        //     agent_trans.times(leg1_transform).times(
+        //         Mat4.scale(0.6,0.6,0.9)
+        //     ),
+        //     this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+        // );
+        //
+        // this.clothing.pant.draw(
+        //     context,
+        //     program_state,
+        //     agent_trans.times(leg2_transform).times(
+        //         Mat4.scale(0.6,0.6,0.9)
+        //     ),
+        //     this.material.override({ambient: 0.5, texture: this.data.textures.pant1Texture})
+        // );
 
 
 
@@ -861,11 +1045,12 @@ export class Control_Demo extends Simulation {
             agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
             agent_trans_s.times(Mat4.translation(0,1.65,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)).times(Mat4.scale(6,6,7.5)),
             agent_trans_s.times(Mat4.translation(0,-1.7,0)).times(Mat4.rotation(Math.PI/2, 0, 1, 0)),
-            agent_trans2.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
+            agent_trans_s.times(Mat4.translation(0,-2.3,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1.2,1.0,1.4)),
             agent_trans_s.times(Mat4.translation(0,-2,0)).times(Mat4.rotation(0, 0, 1, 0)).times(Mat4.scale(1,1,1))]
         let textureList = [this.data.textures.dress1Texture, this.data.textures.dress2Texture,this.data.textures.dress3Texture,this.data.textures.shirt1Texture,this.data.textures.shirt2Texture,this.data.textures.shirt3Texture];
         let pantTextureList = [this.data.textures.pant1Texture, this.data.textures.pant2Texture, this.data.textures.pant2Texture];
         let i = 0;
+        let j = 0
         for (let x = -60; x <= 120; x += 60) {
             // Loop over z coordinates
             for (let z = 10; z <= 60; z += 50) {
@@ -896,7 +1081,7 @@ export class Control_Demo extends Simulation {
                         ).times(
                             Mat4.scale(0.4,0.6,0.8)
                         ),
-                        this.material.override({ambient: 0.5, texture: pantTextureList[0]})
+                        this.material.override({ambient: 0.5, texture: pantTextureList[j]})
                     );
 
 
@@ -910,10 +1095,12 @@ export class Control_Demo extends Simulation {
                         ).times(
                             Mat4.scale(0.4,0.6,0.8)
                         ),
-                        this.material.override({ambient: 0.5, texture: pantTextureList[0]})
+                        this.material.override({ambient: 0.5, texture: pantTextureList[j]})
                     );
+                    j += 1;
                 }
                 i = i+1;
+
             }
         }
 
