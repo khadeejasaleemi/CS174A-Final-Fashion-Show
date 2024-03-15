@@ -274,11 +274,15 @@ export class Control_Demo extends Simulation {
         }
 
         this.hair = new Shape_From_File("assets/hair.obj");
+        this.hair2 = new Shape_From_File("assets/hair2.obj");
         this.stand = new Shape_From_File("assets/stand.obj");
         this.smile = new Shape_From_File("assets/smile.obj");
         this.neck = new Shape_From_File("assets/neck.obj");
         this.body = new Shape_From_File("assets/body_new.obj");
         this.leg = new Shape_From_File("assets/leg.obj");
+        this.scarf = new Shape_From_File("assets/scarf.obj");
+        this.hat = new Shape_From_File("assets/hat.obj");
+        this.bracelet = new Shape_From_File("assets/bracelet.obj");
 
 
         this.new_material = new Material(new defs.Phong_Shader(), {
@@ -308,6 +312,7 @@ export class Control_Demo extends Simulation {
             specularity: 0,
             color: color(1., 1., 1., 1),
         });
+
         this.world_material = new Material(new defs.Phong_Shader(), {
             ambient: 1.0,
             diffusivity: 0,
@@ -338,6 +343,7 @@ export class Control_Demo extends Simulation {
         // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
         this.headEarRightBox = new BoundingBox(vec3(2, -5, -1), vec3(3.5, -3, 1));   // Extended outward on the right
+        this.lengthen_hair = false;
     }
 
     random_color() {
@@ -361,6 +367,10 @@ export class Control_Demo extends Simulation {
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
         this.key_triggered_button("Go to Fashion Show", ["f"], function ()  {
             this.atFashionLand ^= 1;});
+        this.key_triggered_button("Change Hair Length", ["Shift", "h"], () => {
+            this.lengthen_hair = !this.lengthen_hair;
+        }, '#6E6460');
+
     }
 
      willCollide(newPos) {
@@ -709,9 +719,19 @@ export class Control_Demo extends Simulation {
             this.material.override({ambient:.8, texture: this.data.textures.skin})
         );
 
-        this.hair.draw(context, program_state, agent_trans2.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
+        if(this.lengthen_hair){
+            this.hair2.draw(context, program_state, agent_trans2.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
+        }
+        else{
+            this.hair.draw(context, program_state, agent_trans2.times(Mat4.translation(0,0.5,-0.2)),  this.material.override({ ambient: 0, color: eye_color }));
+        }
+
+
         this.smile.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
+
+        //drawing cabinet
+
 
         
 

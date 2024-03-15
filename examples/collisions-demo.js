@@ -184,6 +184,7 @@ export class Test_Data {
             pant1Texture: new Texture("assets/pant1.png"),
             pant2Texture: new Texture("assets/pant2.png"),
 
+
         }
         this.shapes = {
             donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),
