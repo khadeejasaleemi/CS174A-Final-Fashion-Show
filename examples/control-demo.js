@@ -326,14 +326,13 @@ export class Control_Demo extends Simulation {
         this.headMainBox = new BoundingBox(vec3(-2.5, -6.5, -2.5), vec3(2.5, -1.5, 2.5));
 
         this.clothingBoundingBoxes = [
-            new BoundingBox(vec3(-65, -5, 5), vec3(-35, 15, 65)),  // Dress 1
-            new BoundingBox(vec3(-5, -5, 5), vec3(25, 15, 65)),    // Dress 2
-            new BoundingBox(vec3(55, -5, 5), vec3(85, 15, 65)),    // Dress 3
-            new BoundingBox(vec3(-65, -5, 75), vec3(-35, 15, 135)),// Shirt 1
-            new BoundingBox(vec3(-5, -5, 75), vec3(25, 15, 135)),  // Shirt 2
-            new BoundingBox(vec3(55, -5, 75), vec3(85, 15, 135))   // Shirt 3
+            new BoundingBox(vec3(-68, -10, 6), vec3(-50, 20, 15)),   // Dress 1
+            new BoundingBox(vec3(-8, -10, 6), vec3(8, 20, 15)),      // Dress 2
+            new BoundingBox(vec3(52, -10, 6), vec3(68, 20, 15)),     // Dress 3
+            new BoundingBox(vec3(-68, -10, 56), vec3(-50, 20, 65)),  // Shirt 1
+            new BoundingBox(vec3(-8, -10, 56), vec3(8, 20, 65)),     // Shirt 2
+            new BoundingBox(vec3(52, -10, 56), vec3(68, 20, 65))     // Shirt 3
         ];
-
         // Assuming the head is centered at the origin (0,0,0), and the ears are symmetrical
         // The negative x-direction is to the left, and the positAive x-direction is to the right
         this.headEarLeftBox = new BoundingBox(vec3(-1.5, -5, -1), vec3(-2, -3, 1));  // Extended outward on the left
