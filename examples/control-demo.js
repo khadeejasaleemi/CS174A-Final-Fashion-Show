@@ -283,6 +283,7 @@ export class Control_Demo extends Simulation {
         this.scarf = new Shape_From_File("assets/scarf.obj");
         this.hat = new Shape_From_File("assets/hat.obj");
         this.bracelet = new Shape_From_File("assets/bracelet.obj");
+        this.cabinet = new Shape_From_File("assets/cabinet.obj");
 
 
         this.new_material = new Material(new defs.Phong_Shader(), {
@@ -582,6 +583,7 @@ export class Control_Demo extends Simulation {
             Mat4.scale(1,1,1)
         )];
 
+
         this.shapes.sphere.draw(
             context,
             program_state,
@@ -730,10 +732,18 @@ export class Control_Demo extends Simulation {
         this.smile.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-0.3,-1.1).times(Mat4.scale(0.16,0.16,0.16))),  this.material.override({ ambient: 0.4, color: smile_color }));
         this.neck.draw(context, program_state, agent_trans2.times(Mat4.translation(0,-1,0).times(Mat4.scale(0.3,0.4,0.3))),  this.material.override({ambient:.8, texture: this.data.textures.skin}));
 
-        //drawing cabinet
+        // Set desired color
+        let cabinet_color = "#964B00"; // Brown color
+        this.cabinet.draw(
+            context,
+            program_state,
+            Mat4.identity,
+            this.material.override({ ambient: 0.4, color: cabinet_color})
+        );
 
 
-        
+
+
 
         //end of walking implementation
         /*
