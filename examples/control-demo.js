@@ -254,6 +254,7 @@ export class Control_Demo extends Simulation {
         this.agent_pos = vec3(0, -4, 0);
         this.agent_size = 5.0;
 
+
         this.control = {};
         this.control.w = false;
         this.control.a = false;
@@ -376,8 +377,9 @@ export class Control_Demo extends Simulation {
             () => this.control.speed_up = true, '#6E6460', () => this.control.speed_up= false);
         this.key_triggered_button("Slow down",  ["Shift",  "Tab"],
             () => this.control.slow_down = true, '#6E6460', () => this.control.slow_down = false);
-        this.key_triggered_button("Go to Fashion Show", ["f"], function ()  {
-            this.atFashionLand ^= 1;});
+        this.key_triggered_button("Move to Fashion Show Land", ["f"], function() {
+            this.atFashionLand = !this.atFashionLand;
+        });
         this.key_triggered_button("Change Hair Length", ["Shift", "h"], () => {
             this.lengthen_hair = !this.lengthen_hair;
         }, '#6E6460');
@@ -615,6 +617,17 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(100, 100, 2)),
             this.material.override({ambient:.8, texture: this.data.textures.ground}));
 
+        //added movement to fashion land right before any agent translations
+        if (this.atFashionLand) {
+            this.agent_pos = vec3(600, 4, 0);
+            program_state.set_camera(Mat4.translation(-600, -2.80, -82.10));    // Locate the camera here (inverted matrix).
+        }
+
+        else if(!this.atFashionLand){
+            this.agent_pos = vec3(0, -4, 0);
+            program_state.set_camera(Mat4.translation(-3.15, -2.80, -82.10));
+        }
+
         let agent_trans_s = Mat4.translation(0, -4, 0)
             .times(Mat4.rotation(Math.PI, 0, 1, 0)) // Rotate 180 degrees around the y-axis
             .times(Mat4.scale(this.agent_size, this.agent_size, this.agent_size*0.6)).times(Mat4.translation(0, 4, 0));
@@ -749,12 +762,7 @@ export class Control_Demo extends Simulation {
                 .times(Mat4.translation(0, leg_rotation_factor, 0)).times(Mat4.rotation(Math.PI, 0, 1, 0));
         }
 
-        /*if (this.atFashionLand === 1) {
-            this.agent_pos[0] = 600;
-            this.agent_pos[1] = 4;
-            this.agent_pos[2] = 0;
-            program_state.set_camera(Mat4.translation(-600, -2.80, -82.10));    // Locate the camera here (inverted matrix).
-        }*/
+
 
         this.body.draw(
             context,
