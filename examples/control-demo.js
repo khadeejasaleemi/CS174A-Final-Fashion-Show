@@ -427,9 +427,6 @@ export class Control_Demo extends Simulation {
                 this.agent_pos = this.character_main_scene;
             }
         });
-        this.key_triggered_button("Change Hair Length", ["Shift", "h"], () => {
-            this.lengthen_hair = !this.lengthen_hair;
-        }, '#6E6460');
 
         this.key_triggered_button("Scarf", ["Shift", "G"], () => {
             this.scarf_on = !this.scarf_on;
